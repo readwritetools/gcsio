@@ -1,6 +1,6 @@
 {
   "name": "gcsio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JavaScript library and CLI tool for reading, parsing, serializing, and writing Geographic Coordinate System file encodings.",
   "main": "main.js",
   "author": "Joe Honton",
