@@ -140,9 +140,9 @@ if (API.parseIce(gcsHoldingArea, payload, options) == true) {
 
 #### Dependencies
 
-This library depends on <a href='https://www.npmjs.com/package/softlib'>softlib</a>
-and <a href='https://www.npmjs.com/package/iolib'>iolib</a>
-, which should be installed side-by-side.
+This library depends on <a href='https://www.npmjs.com/package/iolib'>iolib</a>
+and <a href='https://www.npmjs.com/package/softlib'>softlib</a>
+.
 
 #### Module exports
 

@@ -1,0 +1,63 @@
+{
+  "name": "gcsio",
+  "version": "1.0.0",
+  "description": "JavaScript library and CLI tool for reading, parsing, serializing, and writing Geographic Coordinate System file encodings.",
+  "main": "main.js",
+  "author": "Joe Honton",
+  "license": "see license.html",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/readwritetools/gcsio.git"
+  },
+  "bin": {
+    "gcsio": "./gcsio"
+  },
+  "dependencies": {
+    "iolib": "^1.0.1",
+    "softlib": "^1.0.6"
+  },
+  "keywords": [
+    "GIS",
+    "longitude",
+    "latitude",
+    "geojson",
+    "ice",
+    "icebin",
+    "gfe",
+    "gfebin",
+    "spherical coordinates",
+    "orthographic earth"
+  ],
+  "bugs": {
+    "url": "https://github.com/readwritetools/gcsio/issues"
+  },
+  "homepage": "https://hub.readwritetools.com/libs/gcsio.blue",
+  "files": [
+    "api",
+    "gcs",
+    "ice",
+    "img",
+    "parsers",
+    "serializers",
+    "gcsio",
+    "license.blue",
+    "license.html",
+    "main.js",
+    "readme.md"
+  ],
+  "com_readwritetools": {
+    "modules": {
+      "esmodules": true,
+      "commonjs": false
+    },
+    "suitability": {
+      "browser": "api",
+      "nodejs": "cli"
+    },
+    "dependencies": {
+      "iolib": ">= 1.0.0",
+      "softlib": ">= 1.0.0"
+    }
+  }
+}
