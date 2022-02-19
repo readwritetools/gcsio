@@ -90,7 +90,8 @@ export default class ByteBuilder extends Array {
         this.push(t);
     }
     writeLenPrefixedText(e) {
-        if (expect(e, [ 'String', 'null', 'undefined' ]), null == e || null == e) return void this.writeUint8(0);
+        if (expect(e, [ 'String', 'Number', 'null', 'undefined' ]), null == e || null == e) return void this.writeUint8(0);
+        'Number' == e.constructor.name && (e = e.toString());
         const r = (new TextEncoder).encode(e);
         var t = r.byteLength;
         if (t > 32767) return terminal.abnormal('text longer than 32767 bytes not supported'), 

@@ -34,8 +34,8 @@ export default class GeojsonSerializer {
                     coordinates: []
                 }
             };
-            this.writeProperties(r.properties, t), r.geometry.coordinates[0] = t.discretePoint.longitude, 
-            r.geometry.coordinates[1] = t.discretePoint.latitude, e.push(r);
+            this.writeProperties(r.properties, t), r.geometry.coordinates[0] = this.writeWithAccuracy(t.discretePoint.longitude), 
+            r.geometry.coordinates[1] = this.writeWithAccuracy(t.discretePoint.latitude), e.push(r);
         }
     }
     writeLineFeatures(e) {
@@ -52,7 +52,8 @@ export default class GeojsonSerializer {
             this.writeProperties(r.properties, t);
             for (let e = 0; e < t.lineSegment.length; e++) {
                 var i = [];
-                i[0] = t.lineSegment[e].longitude, i[1] = t.lineSegment[e].latitude, r.geometry.coordinates.push(i);
+                i[0] = this.writeWithAccuracy(t.lineSegment[e].longitude), i[1] = this.writeWithAccuracy(t.lineSegment[e].latitude), 
+                r.geometry.coordinates.push(i);
             }
             e.push(r);
         }
@@ -71,14 +72,15 @@ export default class GeojsonSerializer {
             this.writeProperties(r.properties, t);
             var i = [];
             for (let e = 0; e < t.outerRing.length; e++) {
-                (o = [])[0] = t.outerRing[e].longitude, o[1] = t.outerRing[e].latitude, i.push(o);
+                (o = [])[0] = this.writeWithAccuracy(t.outerRing[e].longitude), o[1] = this.writeWithAccuracy(t.outerRing[e].latitude), 
+                i.push(o);
             }
             r.geometry.coordinates.push(i);
             for (let e = 0; e < t.innerRings.length; e++) {
                 var s = [];
                 for (let r = 0; r < t.innerRings[e].length; r++) {
                     var o;
-                    (o = [])[0] = t.innerRings[e][r].longitude, o[1] = t.innerRings[e][r].latitude, 
+                    (o = [])[0] = this.writeWithAccuracy(t.innerRings[e][r].longitude), o[1] = this.writeWithAccuracy(t.innerRings[e][r].latitude), 
                     s.push(o);
                 }
                 r.geometry.coordinates.push(s);
@@ -90,7 +92,10 @@ export default class GeojsonSerializer {
         expect(e, 'Object'), expect(t, [ 'GcsPointFeature', 'GcsLineFeature', 'GcsPolygonFeature' ]);
         for (let i in t.kvPairs) {
             var r = t.kvPairs[i];
-            e[i] = r;
+            e[i] = this.writeWithAccuracy(r);
         }
+    }
+    writeWithAccuracy(e) {
+        return null == e ? 'null' : 'Number' != e.constructor.name || Number.isInteger(e) ? e : Number(e.toFixed(this.accuracy));
     }
 }

@@ -14,9 +14,9 @@ import aver from '../node_modules/softlib/aver.js';
 import terminal from '../node_modules/softlib/terminal.js';
 
 export default class StringEncodedSerializer extends EncodedSerializer {
-    constructor(e, t, i, r, n, s) {
-        expect(e, 'GcsHoldingArea'), expect(t, 'String'), expect(i, 'Number'), expect(r, 'String'), 
-        expect(n, 'Array'), expect(s, 'Map'), super(e, t, i, r, n, s), this.stringBuilder = new StringBuilder, 
+    constructor(t, e, i, r, n, s) {
+        expect(t, 'GcsHoldingArea'), expect(e, 'String'), expect(i, 'Number'), expect(r, 'String'), 
+        expect(n, 'Array'), expect(s, 'Map'), super(t, e, i, r, n, s), this.stringBuilder = new StringBuilder, 
         Object.seal(this);
     }
     serialize() {
@@ -37,118 +37,139 @@ export default class StringEncodedSerializer extends EncodedSerializer {
     writeCoordinates() {
         if ('gfe' == this.format) return;
         this.buildIndexedCoordinates();
-        const e = IceMarker.toString(IceMarker.MERIDIANS), t = this.indexedCoordinates.meridians.length;
-        this.stringBuilder.putline(`${e} ${t}`);
-        for (let e = 0; e < t; e++) this.stringBuilder.putline(this.indexedCoordinates.meridians[e]);
+        const t = IceMarker.toString(IceMarker.MERIDIANS), e = this.indexedCoordinates.meridians.length;
+        this.stringBuilder.putline(`${t} ${e}`);
+        for (let t = 0; t < e; t++) {
+            let e = this.indexedCoordinates.meridians[t], i = this.toAccuracy(e);
+            this.stringBuilder.putline(i);
+        }
         const i = IceMarker.toString(IceMarker.PARALLELS), r = this.indexedCoordinates.parallels.length;
         this.stringBuilder.putline(`${i} ${r}`);
-        for (let e = 0; e < r; e++) this.stringBuilder.putline(this.indexedCoordinates.parallels[e]);
+        for (let t = 0; t < r; t++) {
+            let e = this.indexedCoordinates.parallels[t], i = this.toAccuracy(e);
+            this.stringBuilder.putline(i);
+        }
     }
-    writeDatasetPreliminaries(e) {
-        expect(e, 'String');
-        const t = IceMarker.toString(IceMarker.DATASET);
-        this.stringBuilder.putline(`${t} ${this.datasetId}`);
+    writeDatasetPreliminaries(t) {
+        expect(t, 'String');
+        const e = IceMarker.toString(IceMarker.DATASET);
+        this.stringBuilder.putline(`${e} ${this.datasetId}`);
         const i = IceMarker.toString(IceMarker.GEOMETRY);
-        this.stringBuilder.putline(`${i} ${e}`);
-        const r = IceMarker.toString(IceMarker.PROPERTIES), {propertyNames: n, propertyTypes: s} = this.getPropertyNamesAndTypes(this.propertiesToInclude, e), o = n.length;
+        this.stringBuilder.putline(`${i} ${t}`);
+        const r = IceMarker.toString(IceMarker.PROPERTIES), {propertyNames: n, propertyTypes: s} = this.getPropertyNamesAndTypes(this.propertiesToInclude, t), o = n.length;
         this.stringBuilder.putline(`${r} ${o}`), this.stringBuilder.putline(n.join(',')), 
         this.stringBuilder.putline(s.join(','));
     }
-    beginFeatures(e) {
-        const t = IceMarker.toString(IceMarker.FEATURES);
-        this.stringBuilder.putline(`${t} ${e}`);
+    beginFeatures(t) {
+        const e = IceMarker.toString(IceMarker.FEATURES);
+        this.stringBuilder.putline(`${e} ${t}`);
     }
     endFeatures() {
-        const e = IceMarker.toString(IceMarker.END);
-        this.stringBuilder.putline(e);
+        const t = IceMarker.toString(IceMarker.END);
+        this.stringBuilder.putline(t);
     }
     writePointDataset() {
-        var e = this.gcsFeaturePoints.length;
-        if (0 != e) {
-            this.writeDatasetPreliminaries('Point'), this.beginFeatures(e);
-            for (let e of this.gcsFeaturePoints) {
+        var t = this.gcsFeaturePoints.length;
+        if (0 != t) {
+            this.writeDatasetPreliminaries('Point'), this.beginFeatures(t);
+            for (let t of this.gcsFeaturePoints) {
                 if ('ice' == this.format) {
-                    var t = this.indexedCoordinates.getIceX(e.discretePoint.longitude), i = this.indexedCoordinates.getIceY(e.discretePoint.latitude);
-                    this.propertyToString('xCoord', t), this.propertyToString('yCoord', i);
-                } else 'gfe' == this.format && (this.propertyToString('lngCoord', e.discretePoint.longitude), 
-                this.propertyToString('latCoord', e.discretePoint.latitude));
-                for (let t in e.kvPairs) this.isPropertyWanted(t) && this.propertyToString(t, e.kvPairs[t]);
+                    var e = this.indexedCoordinates.getIceX(t.discretePoint.longitude), i = this.indexedCoordinates.getIceY(t.discretePoint.latitude);
+                    this.propertyToString('xCoord', e.toString()), this.propertyToString('yCoord', i.toString());
+                } else 'gfe' == this.format && (this.propertyToString('lngCoord', this.toAccuracy(t.discretePoint.longitude)), 
+                this.propertyToString('latCoord', this.toAccuracy(t.discretePoint.latitude)));
+                for (let e in t.kvPairs) this.isPropertyWanted(e) && this.propertyToString(e, t.kvPairs[e]);
             }
             this.endFeatures();
         }
     }
     writeLineDataset() {
-        var e = this.gcsFeatureLines.length;
-        if (0 != e) {
-            this.writeDatasetPreliminaries('Line'), this.beginFeatures(e);
-            for (let e of this.gcsFeatureLines) {
-                var t = [];
-                for (let i = 0; i < e.lineSegment.length; i++) this.buildLongitudes(t, e.lineSegment[i]);
-                'ice' == this.format ? this.propertyToString('xSegment', t) : 'gfe' == this.format && this.propertyToString('lngSegment', t), 
-                t = [];
-                for (let i = 0; i < e.lineSegment.length; i++) this.buildLatitudes(t, e.lineSegment[i]);
-                'ice' == this.format ? this.propertyToString('ySegment', t) : 'gfe' == this.format && this.propertyToString('latSegment', t);
-                for (let t in e.kvPairs) this.isPropertyWanted(t) && this.propertyToString(t, e.kvPairs[t]);
+        var t = this.gcsFeatureLines.length;
+        if (0 != t) {
+            this.writeDatasetPreliminaries('Line'), this.beginFeatures(t);
+            for (let t of this.gcsFeatureLines) {
+                var e = [];
+                for (let i = 0; i < t.lineSegment.length; i++) this.buildLongitudes(e, t.lineSegment[i]);
+                'ice' == this.format ? this.propertyToString('xSegment', e) : 'gfe' == this.format && this.propertyToString('lngSegment', e), 
+                e = [];
+                for (let i = 0; i < t.lineSegment.length; i++) this.buildLatitudes(e, t.lineSegment[i]);
+                'ice' == this.format ? this.propertyToString('ySegment', e) : 'gfe' == this.format && this.propertyToString('latSegment', e);
+                for (let e in t.kvPairs) this.isPropertyWanted(e) && this.propertyToString(e, t.kvPairs[e]);
             }
             this.endFeatures();
         }
     }
     writePolygonDataset() {
-        var e = this.gcsFeaturePolygons.length;
-        if (0 != e) {
-            this.writeDatasetPreliminaries('Polygon'), this.beginFeatures(e);
-            for (let e of this.gcsFeaturePolygons) {
-                var t = new Array;
-                this.addLongitudeLinearRing(t, e.outerRing);
-                for (let i = 0; i < e.innerRings.length; i++) this.addLongitudeLinearRing(t, e.innerRings[i]);
-                'ice' == this.format ? this.propertyToString('xRings', t) : 'gfe' == this.format && this.propertyToString('lngRings', t), 
-                t = new Array, this.addLatitudeLinearRing(t, e.outerRing);
-                for (let i = 0; i < e.innerRings.length; i++) this.addLatitudeLinearRing(t, e.innerRings[i]);
-                'ice' == this.format ? this.propertyToString('yRings', t) : 'gfe' == this.format && this.propertyToString('latRings', t);
-                for (let t in e.kvPairs) this.isPropertyWanted(t) && this.propertyToString(t, e.kvPairs[t]);
+        var t = this.gcsFeaturePolygons.length;
+        if (0 != t) {
+            this.writeDatasetPreliminaries('Polygon'), this.beginFeatures(t);
+            for (let t of this.gcsFeaturePolygons) {
+                var e = new Array;
+                this.addLongitudeLinearRing(e, t.outerRing);
+                for (let i = 0; i < t.innerRings.length; i++) this.addLongitudeLinearRing(e, t.innerRings[i]);
+                'ice' == this.format ? this.propertyToString('xRings', e) : 'gfe' == this.format && this.propertyToString('lngRings', e), 
+                e = new Array, this.addLatitudeLinearRing(e, t.outerRing);
+                for (let i = 0; i < t.innerRings.length; i++) this.addLatitudeLinearRing(e, t.innerRings[i]);
+                'ice' == this.format ? this.propertyToString('yRings', e) : 'gfe' == this.format && this.propertyToString('latRings', e);
+                for (let e in t.kvPairs) this.isPropertyWanted(e) && this.propertyToString(e, t.kvPairs[e]);
             }
             this.endFeatures();
         }
     }
-    addLongitudeLinearRing(e, t) {
-        expect(e, 'Array'), expect(t, 'Array');
+    addLongitudeLinearRing(t, e) {
+        expect(t, 'Array'), expect(e, 'Array');
         var i = new Array;
-        for (let e = 0; e < t.length - 1; e++) this.buildLongitudes(i, t[e]);
-        e.push(i);
+        for (let t = 0; t < e.length - 1; t++) this.buildLongitudes(i, e[t]);
+        t.push(i);
     }
-    addLatitudeLinearRing(e, t) {
-        expect(e, 'Array'), expect(t, 'Array');
+    addLatitudeLinearRing(t, e) {
+        expect(t, 'Array'), expect(e, 'Array');
         var i = new Array;
-        for (let e = 0; e < t.length - 1; e++) this.buildLatitudes(i, t[e]);
-        e.push(i);
+        for (let t = 0; t < e.length - 1; t++) this.buildLatitudes(i, e[t]);
+        t.push(i);
     }
-    buildLongitudes(e, t) {
-        'ice' == this.format ? e.push(this.indexedCoordinates.getIceX(t.longitude).toString()) : 'gfe' == this.format && e.push(t.longitude.toString());
+    buildLongitudes(t, e) {
+        if ('ice' == this.format) {
+            let i = this.indexedCoordinates.getIceX(e.longitude).toString();
+            t.push(i);
+        } else if ('gfe' == this.format) {
+            let i = this.toAccuracy(e.longitude);
+            t.push(i);
+        }
     }
-    buildLatitudes(e, t) {
-        'ice' == this.format ? e.push(this.indexedCoordinates.getIceY(t.latitude).toString()) : 'gfe' == this.format && e.push(t.latitude.toString());
+    buildLatitudes(t, e) {
+        if ('ice' == this.format) {
+            let i = this.indexedCoordinates.getIceY(e.latitude).toString();
+            t.push(i);
+        } else if ('gfe' == this.format) {
+            let i = this.toAccuracy(e.latitude);
+            t.push(i);
+        }
     }
-    propertyToString(e, t) {
-        switch (this.getPropertyType(e)) {
+    toAccuracy(t) {
+        return expect(t, 'Number'), t.toFixed(this.accuracy);
+    }
+    propertyToString(t, e) {
+        switch (this.getPropertyType(t)) {
           case 'xCoord':
           case 'yCoord':
           case 'lngCoord':
           case 'latCoord':
-            return void this.stringBuilder.putline(t);
+            return void this.stringBuilder.putline(e);
 
           case 'xSegment':
           case 'ySegment':
           case 'lngSegment':
           case 'latSegment':
-            return expect(t, 'Array'), void this.stringBuilder.putline(t.join(','));
+            return expect(e, 'Array'), void this.stringBuilder.putline(e.join(','));
 
           case 'xRings':
           case 'yRings':
           case 'lngRings':
           case 'latRings':
-            expect(t, 'Array');
+            expect(e, 'Array');
             var i = [];
-            for (let e = 0; e < t.length; e++) i.push(t[e].join(','));
+            for (let t = 0; t < e.length; t++) i.push(e[t].join(','));
             return void this.stringBuilder.putline(i.join('|'));
 
           case 'tinyInt':
@@ -157,7 +178,7 @@ export default class StringEncodedSerializer extends EncodedSerializer {
           case 'shortUint':
           case 'longInt':
           case 'longUint':
-            return void (null == t ? this.stringBuilder.putline('') : this.stringBuilder.putline(Math.round(t)));
+            return void (null == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(Math.round(e)));
 
           case 'tinyInt[]':
           case 'tinyUint[]':
@@ -165,25 +186,25 @@ export default class StringEncodedSerializer extends EncodedSerializer {
           case 'shortUint[]':
           case 'longInt[]':
           case 'longUint[]':
-            return expect(t, 'Array'), void (0 == t.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(t.map((e => Math.round(e))).join(',')));
+            return expect(e, 'Array'), void (0 == e.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.map((t => Math.round(t))).join(',')));
 
           case 'float':
-            return void (null == t ? this.stringBuilder.putline('') : this.stringBuilder.putline(t.toFixed(this.accuracy)));
+            return void (null == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.toFixed(this.accuracy)));
 
           case 'float[]':
-            return expect(t, 'Array'), void (0 == t.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(t.map((e => e.toFixed(this.accuracy))).join(',')));
+            return expect(e, 'Array'), void (0 == e.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.map((t => t.toFixed(this.accuracy))).join(',')));
 
           case 'string':
-            return void (null == t ? this.stringBuilder.putline('') : this.stringBuilder.putline(t));
+            return void (null == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(e));
 
           case 'string[]':
-            return void (0 == t.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(JSON.stringify(t)));
+            return void (0 == e.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(JSON.stringify(e)));
 
           case 'json':
-            return void (null == t ? this.stringBuilder.putline('') : this.stringBuilder.putline(JSON.stringify(t)));
+            return void (null == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(JSON.stringify(e)));
 
           default:
-            return terminal.trace(`Ignoring unknown property name ${e} with value ${t}`), void this.stringBuilder.putline('');
+            return terminal.trace(`Ignoring unknown property name ${t} with value ${e}`), void this.stringBuilder.putline('');
         }
     }
 }
