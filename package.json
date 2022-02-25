@@ -51,7 +51,7 @@
       "commonjs": false
     },
     "suitability": {
-      "browser": "none",
+      "browser": "api",
       "nodejs": "cli and api"
     },
     "dependencies": {

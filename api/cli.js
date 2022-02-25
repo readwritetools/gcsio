@@ -50,7 +50,7 @@ export default class CLI {
         var e = new Pfile(this.outputFile.getPath());
         e.exists() || this.usageAndExit(`Output directory does not exist "${e.name}"`), 
         '' == this.inputFormat && (this.inputFormat = this.inputFile.getExtension()), '' == this.outputFormat && (this.outputFormat = this.outputFile.getExtension());
-        const s = [ 'geojson', 'ice', 'icebin', 'gfe', 'gfebin' ];
+        const s = [ 'geojson', 'gfe', 'gfebin', 'ice', 'icebin', 'tae', 'taebin' ];
         s.includes(this.inputFormat) || this.usageAndExit(`--iformat option expected ${JSON.stringify(s)} but got ${this.inputFormat}`), 
         s.includes(this.outputFormat) || this.usageAndExit(`--oformat option expected ${JSON.stringify(s)} but got ${this.outputFormat}`), 
         (this.accuracy < 1 || this.accuracy > 6) && this.usageAndExit(`--accuracy option expected 1 to 6 (1=11km, 2=1100m, 3=110m, 4=11m, 5=1.1m, 6=11cm) but got ${this.accuracy}`);
@@ -62,14 +62,15 @@ export default class CLI {
     }
     usageAndExit(t) {
         var i = [];
-        i.push(''), i.push('SCIO | Spherical coordinates I/O: reading from and writing to files with longitude/latitude coordinates'), 
-        i.push('usage: scio --input=filename --output=filename [options]'), i.push(''), 
+        i.push(''), i.push('GCSCIO | Geographic Coordinate System I/O: reading from and writing to files with longitude/latitude coordinates'), 
+        i.push('usage: gcscio --input=filename --output=filename [options]'), i.push(''), 
         i.push('options:'), i.push('    --input=      filename to read from'), i.push('    --output=     filename to write to'), 
         i.push('    --iformat=    input file format, optionally defaults to filename extension'), 
         i.push('    --oformat=    output file format, optionally defaults to filename extension'), 
-        i.push('                    \'geojson\' RFC 7946'), i.push('                    \'ice\'     Indexed Coordinate Encoding'), 
-        i.push('                    \'icebin\'  Indexed Coordinate Encoding binary'), i.push('                    \'gfe\'     Geographic Feature Encoding'), 
-        i.push('                    \'gfebin\'  Geographic Feature Encoding binary'), i.push('    --accuracy=   digits to use for latitude and longitude coordinates 1 to 6 (1=11km, 2=1100m, 3=110m, 4=11m, 5=1.1m, 6=11cm)'), 
+        i.push('                    \'geojson\' RFC 7946'), i.push('                    \'gfe\'     Geographic Feature Encoding'), 
+        i.push('                    \'gfebin\'  Geographic Feature Encoding binary'), i.push('                    \'ice\'     Indexed Coordinate Encoding'), 
+        i.push('                    \'icebin\'  Indexed Coordinate Encoding binary'), i.push('                    \'tae\'     Topological Arc Encoding'), 
+        i.push('                    \'taebin\'  Topological Arc Encoding binary'), i.push('    --accuracy=   digits to use for latitude and longitude coordinates 1 to 6 (1=11km, 2=1100m, 3=110m, 4=11m, 5=1.1m, 6=11cm)'), 
         i.push('    --dataset-id= identifier for the collection of points, lines or polygons'), 
         i.push('    --properties  which properties to include with each feature'), i.push('                    a comma-separated list of property names, or the keyword \'none\' or \'all\''), 
         i.push('    --declarations  the name of a file which contains declarations of property names and property types'), 
@@ -108,7 +109,7 @@ export default class CLI {
                 }
             }
         } catch (t) {
-            terminal.caught(t.message);
+            terminal.caught(t);
         }
         return t;
     }
@@ -123,24 +124,28 @@ export default class CLI {
         }, i = !1;
         switch (this.inputFormat) {
           case 'geojson':
-          case 'ice':
           case 'gfe':
+          case 'ice':
+          case 'tae':
             i = FileAPI.readTextFile(this.gcsHoldingArea, this.inputFile.name, t);
             break;
 
-          case 'icebin':
           case 'gfebin':
+          case 'icebin':
+          case 'taebin':
             i = FileAPI.readBinaryFile(this.gcsHoldingArea, this.inputFile.name, t);
         }
         switch (i || process.exit(1), this.outputFormat) {
           case 'geojson':
-          case 'ice':
           case 'gfe':
+          case 'ice':
+          case 'tae':
             i = FileAPI.writeTextFile(this.gcsHoldingArea, this.outputFile.name, t);
             break;
 
-          case 'icebin':
           case 'gfebin':
+          case 'icebin':
+          case 'taebin':
             i = FileAPI.writeBinaryFile(this.gcsHoldingArea, this.outputFile.name, t);
         }
         i ? process.exit(0) : process.exit(1);

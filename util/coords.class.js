@@ -8,4 +8,7 @@ export default class Coords {
         expect(e, 'Number'), expect(t, 'Number'), aver(e >= -180 && e <= 180), aver(t >= -90 && t <= 90), 
         this.longitude = Math.fround(e), this.latitude = Math.fround(t);
     }
+    get mapKey() {
+        return `${this.longitude.toFixed(3)},${this.latitude.toFixed(3)}`;
+    }
 }

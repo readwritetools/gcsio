@@ -3,9 +3,13 @@ import GcsPointFeature from '../gcs/gcs-point-feature.class.js';
 
 import GcsLineFeature from '../gcs/gcs-line-feature.class.js';
 
-import GcsPolygonFeature from '../gcs/gcs-polygon-feature.class.js';
+import { GcsPolygonFeature } from '../gcs/gcs-polygon-feature.class.js';
 
-import Coords from '../gcs/coords.class.js';
+import { PolygonRing } from '../gcs/gcs-polygon-feature.class.js';
+
+import { PolygonCutouts } from '../gcs/gcs-polygon-feature.class.js';
+
+import Coords from '../util/coords.class.js';
 
 import expect from '../node_modules/softlib/expect.js';
 
@@ -28,7 +32,7 @@ export default class GeojsonParser {
         try {
             return this.handleAmbiguousJson(e), !0;
         } catch (e) {
-            return terminal.caught(e.message), !1;
+            return terminal.caught(e), !1;
         }
     }
     handleAmbiguousJson(e) {
@@ -51,14 +55,14 @@ export default class GeojsonParser {
         aver('Feature' == e.type), expect(e.geometry, 'Object'), expect(e.properties, [ 'Object', 'null', 'undefined' ]);
         const t = e.geometry.coordinates;
         expect(t, 'Array');
-        const r = e.geometry.type;
-        switch (expect(r, 'String'), r) {
+        const o = e.geometry.type;
+        switch (expect(o, 'String'), o) {
           case 'Point':
             this.handlePoint(e.properties, t);
             break;
 
           case 'MultiPoint':
-            for (let r = 0; r < t.length; r++) this.handlePoint(e.properties, t[r]);
+            for (let o = 0; o < t.length; o++) this.handlePoint(e.properties, t[o]);
             break;
 
           case 'LineString':
@@ -66,7 +70,7 @@ export default class GeojsonParser {
             break;
 
           case 'MultiLineString':
-            for (let r = 0; r < t.length; r++) this.handleLine(e.properties, t[r]);
+            for (let o = 0; o < t.length; o++) this.handleLine(e.properties, t[o]);
             break;
 
           case 'Polygon':
@@ -74,7 +78,7 @@ export default class GeojsonParser {
             break;
 
           case 'MultiPolygon':
-            for (let r = 0; r < t.length; r++) this.handlePolygon(e.properties, t[r]);
+            for (let o = 0; o < t.length; o++) this.handlePolygon(e.properties, t[o]);
             break;
 
           case 'GeometryCollection':
@@ -87,49 +91,49 @@ export default class GeojsonParser {
     }
     handlePoint(e, t) {
         expect(e, 'Object'), expect(t, 'Array');
-        const r = this.copyProperties(e), o = new Coords(t[0], t[1]);
-        this.createPoint(r, o);
+        const o = this.copyProperties(e), r = new Coords(t[0], t[1]);
+        this.createPoint(o, r);
     }
     createPoint(e, t) {
         expect(e, 'Object'), expect(t, 'Coords');
-        var r = new GcsPointFeature;
-        r.kvPairs = e, r.discretePoint = t, this.gcsFeaturePoints.push(r);
+        var o = new GcsPointFeature;
+        o.kvPairs = e, o.discretePoint = t, this.gcsFeaturePoints.push(o);
     }
     handleLine(e, t) {
         expect(e, 'Object'), expect(t, 'Array');
-        const r = this.copyProperties(e), o = [];
+        const o = this.copyProperties(e), r = [];
         for (let e = 0; e < t.length; e++) {
-            const r = t[e];
-            o.push(new Coords(r[0], r[1]));
+            const o = t[e];
+            r.push(new Coords(o[0], o[1]));
         }
-        this.createLine(r, o);
+        this.createLine(o, r);
     }
     createLine(e, t) {
         expect(e, 'Object'), expect(t, 'Array');
-        var r = new GcsLineFeature;
-        r.kvPairs = e, r.lineSegment = t, this.gcsFeatureLines.push(r);
+        var o = new GcsLineFeature;
+        o.kvPairs = e, o.lineSegment = t, this.gcsFeatureLines.push(o);
     }
     handlePolygon(e, t) {
         expect(e, 'Object'), expect(t, 'Array');
-        const r = this.copyProperties(e), o = [], s = [];
+        const o = this.copyProperties(e), r = new PolygonRing, s = new PolygonCutouts;
         for (let e = 0; e < t.length; e++) {
-            const r = t[e], a = r.length;
+            const o = t[e], a = o.length;
             if (0 == e) {
-                for (let e = 0; e < a; e++) o.push(new Coords(r[e][0], r[e][1]));
-                aver(o[0].longitude == o[a - 1].longitude), aver(o[0].latitude == o[a - 1].latitude);
+                for (let e = 0; e < a; e++) r.push(new Coords(o[e][0], o[e][1]));
+                aver(r[0].longitude == r[a - 1].longitude), aver(r[0].latitude == r[a - 1].latitude);
             } else {
-                var n = [];
-                for (let e = 0; e < a; e++) n.push(new Coords(r[e][0], r[e][1]));
+                var n = new PolygonRing;
+                for (let e = 0; e < a; e++) n.push(new Coords(o[e][0], o[e][1]));
                 aver(n[0].longitude == n[a - 1].longitude), aver(n[0].latitude == n[a - 1].latitude), 
                 s.push(n);
             }
         }
-        this.createPolygon(r, o, s);
+        this.createPolygon(o, r, s);
     }
-    createPolygon(e, t, r) {
-        expect(e, 'Object'), expect(t, 'Array'), expect(r, 'Array');
-        var o = new GcsPolygonFeature;
-        o.kvPairs = e, o.outerRing = t, o.innerRings = r, this.gcsFeaturePolygons.push(o);
+    createPolygon(e, t, o) {
+        expect(e, 'Object'), expect(t, 'PolygonRing'), expect(o, 'PolygonCutouts');
+        var r = new GcsPolygonFeature;
+        r.kvPairs = e, r.outerRing = t, r.innerRings = o, this.gcsFeaturePolygons.push(r);
     }
     copyProperties(e) {
         return expect(e, 'Object'), null == e || null == e ? {} : Object.assign({}, e);

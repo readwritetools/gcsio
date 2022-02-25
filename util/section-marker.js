@@ -1,11 +1,19 @@
 /* Copyright (c) 2022 Read Write Tools. */
+export const GFE_PROLOG = [ '!gfebin 1.0', '!gfe 1.0' ];
+
 export const ICE_PROLOG = [ '!icebin 1.0', '!ice 1.0' ];
 
-export const GFE_PROLOG = [ '!gfebin 1.0', '!gfe 1.0' ];
+export const TAE_PROLOG = [ '!taebin 1.0', '!tae 1.0' ];
 
 export const MERIDIANS = [ 31321855, '!meridians' ];
 
 export const PARALLELS = [ 48099071, '!parallels' ];
+
+export const COORDINATES = [ 299757311, '!coordinates' ];
+
+export const EDGES = [ 316534527, '!edges' ];
+
+export const ARCS = [ 333311743, '!arcs' ];
 
 export const DATASET = [ 64876287, '!dataset' ];
 

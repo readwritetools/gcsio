@@ -30,7 +30,7 @@
 
 <table>
 	<tr><th>Abstract</th></tr>
-	<tr><td>The <span class=product>gcsio</span> JavaScript library and CLI tool is for reading, parsing, serializing, and writing Geographic Coordinate System file encodings. It serves as an intermediate exchange format for points, lines, and polygons that use longitude/latitudes.</td></tr>
+	<tr><td>The <span class=product>gcsio</span> JavaScript library and CLI tool is for reading, parsing, serializing, and writing Geographic Coordinate System file encodings. It serves as a GIS exchange format for points, lines, and polygons that use longitude/latitude coordinates.</td></tr>
 </table>
 
 ### Motivation
@@ -48,16 +48,18 @@ component `rwt-orthographic-earth`.
 Supported input and output formats comprise:
 
    * geojson - RFC 7946
-   * ice - Indexed Coordinate Encoding
-   * icebin - Indexed Coordinate Encoding binary
    * gfe - Geographic Feature Encoding
+   * ice - Indexed Coordinate Encoding
+   * tae - Topological Arc Encoding
    * gfebin - Geographic Feature Encoding binary
+   * icebin - Indexed Coordinate Encoding binary
+   * taebin - Topological Arc Encoding binary
 
 The JavaScript API reads from and writes to standard ECMAScript Strings and
 ArrayBuffers.
 
 The API does not access the host computer's file system, so it can be used with
-client facing web frontends that obtain data using HTTP.
+client facing web pages that obtain data using HTTP.
 
 The CLI uses the node.js filesystem package to read and write files using the
 API's exported functions.
@@ -76,8 +78,8 @@ To install and run the CLI:
 
 [user@host]# gcsio --help
 
-GCSIO | Spherical coordinates I/O: reading from and writing to files with longitude/latitude coordinates
-usage: gcsio --input=filename --output=filename [options]
+GCSCIO | Geographic Coordinate System I/O: reading from and writing to files with longitude/latitude coordinates
+usage: gcscio --input=filename --output=filename [options]
 
 options:
     --input=      filename to read from
@@ -85,10 +87,12 @@ options:
     --iformat=    input file format, optionally defaults to filename extension
     --oformat=    output file format, optionally defaults to filename extension
                     'geojson' RFC 7946
-                    'ice'     Indexed Coordinate Encoding
-                    'icebin'  Indexed Coordinate Encoding binary
                     'gfe'     Geographic Feature Encoding
                     'gfebin'  Geographic Feature Encoding binary
+                    'ice'     Indexed Coordinate Encoding
+                    'icebin'  Indexed Coordinate Encoding binary
+                    'tae'     Topological Arc Encoding
+                    'taebin'  Topological Arc Encoding binary
     --accuracy=   digits to use for latitude and longitude coordinates 1 to 6 (1=11km, 2=1100m, 3=110m, 4=11m, 5=1.1m, 6=11cm)
     --dataset-id= identifier for the collection of points, lines or polygons
     --properties  which properties to include with each feature
@@ -104,7 +108,6 @@ options:
                       json
     --version
     --help
-
 ```
 
 #### Browser
@@ -132,7 +135,7 @@ var options = {
 };
 
 if (API.parseIce(gcsHoldingArea, payload, options) == true) {
-    // gcsHoldingArea.gcsFeaturePoints now contains the parsed features with their geometries and properties.
+    // gcsHoldingArea now contains the parsed features with their geometries and properties.
 }
 ```
 
@@ -157,7 +160,7 @@ and <a href='https://www.npmjs.com/package/softlib'>softlib</a>
 
 <table>
 	<tr><td>Browser</td> 			<td>API</td></tr>
-	<tr><td>node.js</td> 			<td>CLI</td></tr>
+	<tr><td>node.js</td> 			<td>CLI and API</td></tr>
 </table>
 
 #### Availability
