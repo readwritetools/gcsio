@@ -40,6 +40,8 @@
     "img",
     "parsers",
     "serializers",
+    "tae",
+    "util",
     "license.blue",
     "license.html",
     "main.mjs",
