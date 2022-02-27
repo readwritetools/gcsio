@@ -29,7 +29,7 @@ export default class StringEncodedSerializer extends EncodedSerializer {
             return void this.stringBuilder.putline(SectionMarker.ICE_PROLOG[1]);
 
           case 'tae':
-            return void this.stringBuilder.putline(SectionMarker.TAE_PROLOG[1]);
+            return void (this.debugTopology ? this.stringBuilder.putline(SectionMarker.TAE_PROLOG[2]) : this.stringBuilder.putline(SectionMarker.TAE_PROLOG[1]));
 
           default:
             terminal.logic(`expected 'gfe', 'ice' or 'tae' but got ${this.format}`);

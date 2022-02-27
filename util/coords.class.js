@@ -9,6 +9,6 @@ export default class Coords {
         this.longitude = Math.fround(e), this.latitude = Math.fround(t);
     }
     get mapKey() {
-        return `${this.longitude.toFixed(3)},${this.latitude.toFixed(3)}`;
+        return `${this.longitude.toFixed(7)},${this.latitude.toFixed(7)}`;
     }
 }

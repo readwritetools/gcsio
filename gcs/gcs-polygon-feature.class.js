@@ -21,7 +21,7 @@ export class GcsPolygonFeature extends GcsBaseFeature {
     closeOneRing(e) {
         expect(e, 'PolygonRing');
         var s = e.length;
-        e[0].longitude == e[s - 1].longitude && e[0].latitude == e[s - 1].latitude || e.push(new Coords(e[0].longitude, e[0].latitude));
+        0 != s && (e[0].longitude == e[s - 1].longitude && e[0].latitude == e[s - 1].latitude || e.push(new Coords(e[0].longitude, e[0].latitude)));
     }
     get debugName() {
         return this.kvPairs('name');

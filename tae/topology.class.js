@@ -24,31 +24,36 @@ export class Topology {
     }
     buildVertices(e) {
         expect(e, 'Array');
-        for (let r = 0; r < e.length; r++) {
-            let t = e[r];
+        for (let s = 0; s < e.length; s++) {
+            let t = e[s];
             for (let e = 0; e < t.outerRing.length; e++) this.taeCoords.addVertex(t.outerRing[e]);
             for (let e = 0; e < t.innerRings.length; e++) {
-                var s = t.innerRings[e];
-                for (let e = 0; e < s.length; e++) this.taeCoords.addVertex(s[e]);
+                var r = t.innerRings[e];
+                for (let e = 0; e < r.length; e++) this.taeCoords.addVertex(r[e]);
             }
         }
+        this.taeCoords.topologyErrorType4 > 0 && terminal.trace(`${this.taeCoords.topologyErrorType4} duplicate vertices discarded due to low accuracy`);
     }
     buildMapOfEdges(e) {
         expect(e, 'Array');
-        for (let r = 0; r < e.length; r++) {
-            let t = e[r];
-            this.buildOneRingsEdges(t.outerRing, 'perimeter', t.kvPairs.name);
-            for (let e = 0; e < t.innerRings.length; e++) {
-                var s = t.innerRings[e];
-                this.buildOneRingsEdges(s, 'cutout', t.kvPairs.name);
+        for (let t = 0; t < e.length; t++) {
+            let o = e[t];
+            var r = o.kvPairs.name;
+            this.buildOneRingsEdges(o.outerRing, 'perimeter', r);
+            for (let e = 0; e < o.innerRings.length; e++) {
+                var s = o.innerRings[e];
+                this.buildOneRingsEdges(s, 'cutout', r);
             }
         }
+        this.taeEdges.topologyErrorType1 > 0 && terminal.trace(`${this.taeEdges.topologyErrorType1} duplicate coordinates discarded due to low accuracy`), 
+        this.taeEdges.topologyErrorType2 > 0 && terminal.trace(`${this.taeEdges.topologyErrorType2} double-back digitizer errors discarded due to low accuracy`), 
+        this.taeEdges.topologyErrorType3 > 0 && terminal.trace(`${this.taeEdges.topologyErrorType3} triple-edge ownership discarded due to low accuracy`);
     }
-    buildOneRingsEdges(e, s, r) {
-        expect(e, 'PolygonRing'), expect(s, 'String'), expect(r, 'String'), e.type = s, 
-        e.polygonName = r;
-        for (let s = 0; s < e.length - 1; s++) {
-            let r = e[s], t = e[s + 1], o = this.inverseCoords.get(r.mapKey);
+    buildOneRingsEdges(e, r, s) {
+        expect(e, 'PolygonRing'), expect(r, 'String'), expect(s, [ 'String', 'undefined' ]), 
+        e.type = r, e.polygonName = s || '';
+        for (let r = 0; r < e.length - 1; r++) {
+            let s = e[r], t = e[r + 1], o = this.inverseCoords.get(s.mapKey);
             aver(null != o);
             let i = this.inverseCoords.get(t.mapKey);
             aver(null != i), this.taeEdges.addEdge(o, i, e);
@@ -56,55 +61,58 @@ export class Topology {
     }
     buildArcs(e) {
         expect(e, 'Array');
-        for (let r = 0; r < e.length; r++) {
-            let t = e[r];
+        for (let s = 0; s < e.length; s++) {
+            let t = e[s];
             this.buildOneRingsArcs(t.outerRing);
             for (let e = 0; e < t.innerRings.length; e++) {
-                var s = t.innerRings[e];
-                this.buildOneRingsArcs(s);
+                var r = t.innerRings[e];
+                this.buildOneRingsArcs(r);
             }
         }
     }
     buildOneRingsArcs(e) {
         expect(e, 'PolygonRing');
-        var s = [], r = e.edgeRefs[0], t = Math.abs(r), o = this.taeEdges[t];
-        r < 0 ? (s.push(o.coordsIndexB), s.push(o.coordsIndexA)) : (s.push(o.coordsIndexA), 
-        s.push(o.coordsIndexB));
-        for (let a = 1; a < e.edgeRefs.length; a++) {
-            var i = e.edgeRefs[a], n = Math.abs(i), d = this.taeEdges[n];
-            o.forwardRing === d.forwardRing && o.reverseRing === d.reverseRing && s.length < 256 ? i < 0 ? s.push(d.coordsIndexA) : s.push(d.coordsIndexB) : (this.addArc(e, s), 
-            s = [], i < 0 ? (s.push(d.coordsIndexB), s.push(d.coordsIndexA)) : (s.push(d.coordsIndexA), 
-            s.push(d.coordsIndexB))), r = i, t = n, o = d;
+        var r = [];
+        if (0 != e.edgeRefs.length) {
+            var s = e.edgeRefs[0], t = Math.abs(s), o = this.taeEdges[t];
+            s < 0 ? (r.push(o.coordsIndexB), r.push(o.coordsIndexA)) : (r.push(o.coordsIndexA), 
+            r.push(o.coordsIndexB));
+            for (let a = 1; a < e.edgeRefs.length; a++) {
+                var i = e.edgeRefs[a], n = Math.abs(i), d = this.taeEdges[n];
+                o.forwardRing === d.forwardRing && o.reverseRing === d.reverseRing && r.length < 256 ? i < 0 ? r.push(d.coordsIndexA) : r.push(d.coordsIndexB) : (this.addArc(e, r), 
+                r = [], i < 0 ? (r.push(d.coordsIndexB), r.push(d.coordsIndexA)) : (r.push(d.coordsIndexA), 
+                r.push(d.coordsIndexB))), s = i, t = n, o = d;
+            }
+            this.addArc(e, r);
         }
-        this.addArc(e, s);
     }
-    addArc(e, s) {
-        expect(e, 'PolygonRing'), expect(s, 'Array');
-        var r = new Arc;
-        for (let e = 0; e < s.length; e++) r.push(s[e]);
-        if (null != (o = this.inverseArcs.get(r.reverseMapKey))) {
+    addArc(e, r) {
+        expect(e, 'PolygonRing'), expect(r, 'Array');
+        var s = new Arc;
+        for (let e = 0; e < r.length; e++) s.push(r[e]);
+        if (null != (o = this.inverseArcs.get(s.reverseMapKey))) {
             var t = -1 * o;
             e.arcRefs.push(t);
         } else {
             var o = this.taeArcs.length;
-            this.taeArcs.push(r), this.inverseArcs.set(r.mapKey, o), e.arcRefs.push(o);
+            this.taeArcs.push(s), this.inverseArcs.set(s.mapKey, o), e.arcRefs.push(o);
         }
     }
 }
 
 export class TaeCoords extends Array {
     constructor(e) {
-        super(), this.topology = e;
+        super(), this.topology = e, this.topologyErrorType4 = 0;
     }
     initializeForSerialization() {
         this.addVertex(new Coords(0, 0));
     }
     addVertex(e) {
         expect(e, 'Coords');
-        let s = e.mapKey;
-        if (this.topology.inverseCoords.has(s)) return;
-        let r = this.length;
-        super.push(e), this.topology.inverseCoords.set(s, r);
+        let r = e.mapKey;
+        if (this.topology.inverseCoords.has(r)) return void this.topologyErrorType4++;
+        let s = this.length;
+        super.push(e), this.topology.inverseCoords.set(r, s);
     }
     push() {
         terminal.logic('TaeCoords: use addVertex(), not push()');
@@ -125,18 +133,23 @@ export class InverseCoords extends Map {
 
 export class TaeEdges extends Array {
     constructor(e) {
-        super(), this.topology = e;
+        super(), this.topology = e, this.topologyErrorType1 = 0, this.topologyErrorType2 = 0, 
+        this.topologyErrorType3 = 0;
     }
     initializeForSerialization() {
-        this.addEdge(0, 0, new PolygonRing);
+        var e = new Edge(0, 0);
+        super.push(e);
     }
-    addEdge(e, s, r) {
-        expect(e, 'Number'), expect(s, 'Number'), expect(r, 'PolygonRing');
-        var t = new Edge(e, s), o = null;
-        this.topology.inverseEdges.has(t.reverseMapKey) ? (o = this.topology.inverseEdges.get(t.reverseMapKey), 
-        (t = this.topology.taeEdges[o]).setReverseRing(r), r.edgeRefs.push(-1 * o)) : (t.setForwardRing(r), 
-        o = this.length, super.push(t), this.topology.inverseEdges.set(t.forwardMapKey, o), 
-        r.edgeRefs.push(o));
+    addEdge(e, r, s) {
+        if (expect(e, 'Number'), expect(r, 'Number'), expect(s, 'PolygonRing'), e != r) {
+            var t = new Edge(e, r), o = null;
+            if (this.topology.inverseEdges.has(t.reverseMapKey)) {
+                if (o = this.topology.inverseEdges.get(t.reverseMapKey), s == (t = this.topology.taeEdges[o]).forwardRing) return void this.topologyErrorType2++;
+                if (null != t.reverseRing) return void this.topologyErrorType3++;
+                t.setReverseRing(s), s.edgeRefs.push(-1 * o);
+            } else t.setForwardRing(s), o = this.length, super.push(t), this.topology.inverseEdges.set(t.forwardMapKey, o), 
+            s.edgeRefs.push(o);
+        } else this.topologyErrorType1++;
     }
     push() {
         terminal.logic('TaeEdges: use addEdge(), not push()');
@@ -150,8 +163,8 @@ export class InverseEdges extends Map {
 }
 
 export class Edge {
-    constructor(e, s) {
-        expect(e, 'Number'), expect(s, 'Number'), this.coordsIndexA = e, this.coordsIndexB = s, 
+    constructor(e, r) {
+        expect(e, 'Number'), expect(r, 'Number'), this.coordsIndexA = e, this.coordsIndexB = r, 
         this.forwardRing = null, this.reverseRing = null;
     }
     get forwardMapKey() {

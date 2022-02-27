@@ -3,7 +3,7 @@ export const GFE_PROLOG = [ '!gfebin 1.0', '!gfe 1.0' ];
 
 export const ICE_PROLOG = [ '!icebin 1.0', '!ice 1.0' ];
 
-export const TAE_PROLOG = [ '!taebin 1.0', '!tae 1.0' ];
+export const TAE_PROLOG = [ '!taebin 1.0', '!tae 1.0', 'taedebug' ];
 
 export const MERIDIANS = [ 31321855, '!meridians' ];
 

@@ -197,6 +197,7 @@ export default class StringEncodedParser extends EncodedParser {
                     if (h < 0) var p = c.getReverseIndexes(); else p = c;
                     for (let e = 0; e < p.length - 1; e++) {
                         var m = p[e], g = this.topology.taeCoords[m];
+                        null == g && terminal.trace(`coordsIndex ${m} not in this.topology.taeCoords`), 
                         l.push(Math.fround(g.longitude)), u.push(Math.fround(g.latitude));
                     }
                 }

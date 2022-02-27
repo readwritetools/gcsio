@@ -45,43 +45,43 @@ export function parseTaeBinary(e, r, a) {
 
 export function serializeGeojson(e, r) {
     expect(r, 'Object');
-    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'none' ];
+    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'all' ];
     r.declarations || new Map;
     return new GeojsonSerializer(e, a, t, n).serialize();
 }
 
 export function serializeGfe(e, r) {
     expect(r, 'Object');
-    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'none' ], i = r.declarations || new Map;
+    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'all' ], i = r.declarations || new Map;
     return new StringEncodedSerializer(e, 'gfe', a, t, n, i).serialize();
 }
 
 export function serializeIce(e, r) {
     expect(r, 'Object');
-    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'none' ], i = r.declarations || new Map;
+    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'all' ], i = r.declarations || new Map;
     return new StringEncodedSerializer(e, 'ice', a, t, n, i).serialize();
 }
 
 export function serializeTae(e, r) {
     expect(r, 'Object');
-    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'none' ], i = r.declarations || new Map;
+    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'all' ], i = r.declarations || new Map;
     return new StringEncodedSerializer(e, 'tae', a, t, n, i).serialize();
 }
 
 export function serializeGfeBinary(e, r) {
     expect(r, 'Object');
-    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'none' ], i = r.declarations || new Map;
+    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'all' ], i = r.declarations || new Map;
     return new ByteEncodedSerializer(e, 'gfebin', a, t, n, i).serialize();
 }
 
 export function serializeIceBinary(e, r) {
     expect(r, 'Object');
-    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'none' ], i = r.declarations || new Map;
+    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'all' ], i = r.declarations || new Map;
     return new ByteEncodedSerializer(e, 'icebin', a, t, n, i).serialize();
 }
 
 export function serializeTaeBinary(e, r) {
     expect(r, 'Object');
-    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'none' ], i = r.declarations || new Map;
+    var a = r.accuracy || 3, t = r.datasetId || 'unnamedDataset', n = r.properties || [ 'all' ], i = r.declarations || new Map;
     return new ByteEncodedSerializer(e, 'taebin', a, t, n, i).serialize();
 }
