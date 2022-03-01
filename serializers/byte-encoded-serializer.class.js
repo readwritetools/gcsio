@@ -7,17 +7,17 @@ import IndexedCoordinates from '../ice/indexed-coordinates.class.js';
 
 import ByteBuilder from './builders/byte-builder.class.js';
 
-import expect from '../node_modules/softlib/expect.js';
+import expect from 'softlib/expect.js';
 
-import aver from '../node_modules/softlib/aver.js';
+import aver from 'softlib/aver.js';
 
-import terminal from '../node_modules/softlib/terminal.js';
+import terminal from 'softlib/terminal.js';
 
 export default class ByteEncodedSerializer extends EncodedSerializer {
     constructor(e, t, i, r, n, s) {
         expect(e, 'GcsHoldingArea'), expect(t, 'String'), expect(i, 'Number'), expect(r, 'String'), 
         expect(n, 'Array'), expect(s, 'Map'), super(e, t, i, r, n, s), this.byteBuilder = new ByteBuilder, 
-        this.arcRefLenBits = 0, this.arcIndexLenBits = 0, Object.seal(this);
+        this.arcRefLenBits = 0, this.arcIndexLenBits = 0, this.coordsIndexLenBits = 0, Object.seal(this);
     }
     serialize() {
         return super.serialize(), this.byteBuilder.build();
@@ -65,10 +65,10 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
         this.byteBuilder.writeUint32(t - 1), this.determineBitsNeededForArcs(), this.byteBuilder.writeUint8(this.arcRefLenBits);
         for (let e = 1; e < t; e++) {
             var i = this.topology.taeArcs[e];
-            aver(i.length <= 256), this.byteBuilder.writeUint8(i.length);
+            aver(i.length <= 255), this.byteBuilder.writeUint8(i.length);
             for (let e = 0; e < i.length; e++) {
                 var r = i[e];
-                16 == this.arcIndexLenBits ? this.byteBuilder.writeUint16(r) : this.byteBuilder.writeUint32(r);
+                16 == this.coordsIndexLenBits ? this.byteBuilder.writeUint16(r) : this.byteBuilder.writeUint32(r);
             }
         }
     }
@@ -77,7 +77,8 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             Math.max(0, e.outerRing.arcRefs);
             for (let t = 0; t < e.innerRings.length; t++) Math.max(0, e.innerRings[t].arcRefs);
         }
-        this.arcRefLenBits = 8, this.topology.taeArcs.length < 32767 ? this.arcIndexLenBits = 16 : this.arcIndexLenBits = 32;
+        this.arcRefLenBits = 8, this.topology.taeArcs.length < 32767 ? this.arcIndexLenBits = 16 : this.arcIndexLenBits = 32, 
+        this.topology.taeCoords.length < 65536 ? this.coordsIndexLenBits = 16 : this.coordsIndexLenBits = 32;
     }
     writeDatasetPreliminaries(e) {
         expect(e, 'String');
@@ -247,41 +248,41 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             return void this.byteBuilder.writeUint32(t);
 
           case 'tinyInt[]':
-            return expect(t, 'Array'), aver(t.length <= 256), this.byteBuilder.writeUint8(t.length), 
+            return expect(t, 'Array'), aver(t.length <= 255), this.byteBuilder.writeUint8(t.length), 
             void t.forEach((e => this.byteBuilder.writeInt8(e)));
 
           case 'tinyUint[]':
-            return expect(t, 'Array'), aver(t.length <= 256), this.byteBuilder.writeUint8(t.length), 
+            return expect(t, 'Array'), aver(t.length <= 255), this.byteBuilder.writeUint8(t.length), 
             void t.forEach((e => this.byteBuilder.writeUint8(e)));
 
           case 'shortInt[]':
-            return expect(t, 'Array'), aver(t.length <= 256), this.byteBuilder.writeUint8(t.length), 
+            return expect(t, 'Array'), aver(t.length <= 255), this.byteBuilder.writeUint8(t.length), 
             void t.forEach((e => this.byteBuilder.writeInt16(e)));
 
           case 'shortUint[]':
-            return expect(t, 'Array'), aver(t.length <= 256), this.byteBuilder.writeUint8(t.length), 
+            return expect(t, 'Array'), aver(t.length <= 255), this.byteBuilder.writeUint8(t.length), 
             void t.forEach((e => this.byteBuilder.writeUint16(e)));
 
           case 'longInt[]':
-            return expect(t, 'Array'), aver(t.length <= 256), this.byteBuilder.writeUint8(t.length), 
+            return expect(t, 'Array'), aver(t.length <= 255), this.byteBuilder.writeUint8(t.length), 
             void t.forEach((e => this.byteBuilder.writeInt32(e)));
 
           case 'longUint[]':
-            return expect(t, 'Array'), aver(t.length <= 256), this.byteBuilder.writeUint8(t.length), 
+            return expect(t, 'Array'), aver(t.length <= 255), this.byteBuilder.writeUint8(t.length), 
             void t.forEach((e => this.byteBuilder.writeUint32(e)));
 
           case 'float':
             return void this.byteBuilder.writeFloat32(t);
 
           case 'float[]':
-            return expect(t, 'Array'), aver(t.length <= 256), this.byteBuilder.writeUint8(t.length), 
+            return expect(t, 'Array'), aver(t.length <= 255), this.byteBuilder.writeUint8(t.length), 
             void t.forEach((e => this.byteBuilder.writeFloat32(e)));
 
           case 'string':
             return void (null == t ? this.byteBuilder.writeUint8(0) : this.byteBuilder.writeLenPrefixedText(t));
 
           case 'string[]':
-            expect(t, 'Array'), aver(t.length <= 256), this.byteBuilder.writeUint8(t.length);
+            expect(t, 'Array'), aver(t.length <= 255), this.byteBuilder.writeUint8(t.length);
             for (let e = 0; e < t.length; e++) this.byteBuilder.writeLenPrefixedText(t[e]);
             return;
 

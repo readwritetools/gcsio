@@ -9,11 +9,11 @@ import { Arc } from '../tae/topology.class.js';
 
 import { PolygonRing } from '../gcs/gcs-polygon-feature.class.js';
 
-import expect from '../node_modules/softlib/expect.js';
+import expect from 'softlib/expect.js';
 
-import aver from '../node_modules/softlib/aver.js';
+import aver from 'softlib/aver.js';
 
-import terminal from '../node_modules/softlib/terminal.js';
+import terminal from 'softlib/terminal.js';
 
 export default class ByteEncodedParser extends EncodedParser {
     constructor(e, t) {
@@ -104,13 +104,14 @@ export default class ByteEncodedParser extends EncodedParser {
             var e = new Arc;
             const t = this.readUint8();
             aver(t <= 256);
-            for (let r = 0; r < t; r++) 16 == this.arcIndexLenBits ? e.push(this.readUint16()) : e.push(this.readUint32());
+            for (let r = 0; r < t; r++) 16 == this.coordsIndexLenBits ? e.push(this.readUint16()) : e.push(this.readUint32());
             this.topology.taeArcs.push(e);
         }
         return aver(this.numArcs == this.topology.taeArcs.length - 1), !0;
     }
     determineBitsNeededForArcs() {
-        this.arcRefLenBits = this.readUint8(), this.numArcs < 32767 ? this.arcIndexLenBits = 16 : this.arcIndexLenBits = 32;
+        this.arcRefLenBits = this.readUint8(), this.numArcs < 32767 ? this.arcIndexLenBits = 16 : this.arcIndexLenBits = 32, 
+        this.topology.taeCoords.length < 65536 ? this.coordsIndexLenBits = 16 : this.coordsIndexLenBits = 32;
     }
     readProperties() {
         expect(this.numProperties, 'Number'), aver(this.numProperties >= 0);

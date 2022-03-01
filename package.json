@@ -5,10 +5,9 @@
   "author": "Joe Honton",
   "license": "see license.html",
   "type": "module",
-  "module": "/api/file-api.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/readwritetools/gcsio.git"
+  "exports": {
+  	".": "./api/sdk.js",
+  	"./*": "./*"
   },
   "bin": {
     "gcsio": "./main.mjs"
@@ -29,6 +28,10 @@
     "spherical coordinates",
     "orthographic earth"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/readwritetools/gcsio.git"
+  },
   "bugs": {
     "url": "https://github.com/readwritetools/gcsio/issues"
   },
@@ -55,10 +58,6 @@
     "suitability": {
       "browser": "api",
       "nodejs": "cli and api"
-    },
-    "dependencies": {
-      "iolib": ">= 1.0.0",
-      "softlib": ">= 1.0.0"
     }
   }
 }

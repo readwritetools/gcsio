@@ -15,11 +15,11 @@ import * as SectionMarker from '../util/section-marker.js';
 
 import IndexedCoordinates from '../ice/indexed-coordinates.class.js';
 
-import expect from '../node_modules/softlib/expect.js';
+import expect from 'softlib/expect.js';
 
-import aver from '../node_modules/softlib/aver.js';
+import aver from 'softlib/aver.js';
 
-import terminal from '../node_modules/softlib/terminal.js';
+import terminal from 'softlib/terminal.js';
 
 export default class EncodedParser {
     constructor(e, t) {
@@ -28,8 +28,9 @@ export default class EncodedParser {
         this.indexedCoordinates = e.indexedCoordinates, this.topology = e.topology, this.format = t, 
         this.datasetName = '', this.geometryType = '', this.propertyNames = [], this.propertyTypes = [], 
         this.numMeridians = 0, this.numParallels = 0, this.numCoordinates = 0, this.numEdges = 0, 
-        this.numArcs = 0, this.arcRefLenBits = 0, this.arcIndexLenBits = 0, this.numProperties = 0, 
-        this.numFeatures = 0, this.payload = null, this.payloadLength = 0, this.payloadOffset = 0;
+        this.numArcs = 0, this.arcRefLenBits = 0, this.arcIndexLenBits = 0, this.coordsIndexLenBits = 0, 
+        this.numProperties = 0, this.numFeatures = 0, this.payload = null, this.payloadLength = 0, 
+        this.payloadOffset = 0;
     }
     parse(e) {
         expect(e, [ 'String', 'ArrayBuffer' ]);
@@ -76,10 +77,10 @@ export default class EncodedParser {
     }
     readFeatures() {
         expect(this.numFeatures, 'Number'), aver(this.numFeatures >= 0);
-        for (let o = 0; o < this.numFeatures; o++) {
+        for (let i = 0; i < this.numFeatures; i++) {
             var e = this.createFeature(), t = new Array, r = new Array;
-            for (let o = 0; o < this.numProperties; o++) {
-                var s = this.propertyNames[o], a = this.propertyTypes[o];
+            for (let i = 0; i < this.numProperties; i++) {
+                var s = this.propertyNames[i], a = this.propertyTypes[i];
                 try {
                     if (0 == this.readFeatureProperties(e, s, a, t, r)) return !1;
                 } catch (e) {
@@ -97,9 +98,9 @@ export default class EncodedParser {
                     aver(t[a].length == r[a].length);
                     let s = t[a].length;
                     if (0 == a) for (let a = 0; a < s; a++) e.outerRing.push(new Coords(t[0][a], r[0][a])); else {
-                        let o = new PolygonRing;
-                        for (let e = 0; e < s; e++) o.push(new Coords(t[a][e], r[a][e]));
-                        e.innerRings.push(o);
+                        let i = new PolygonRing;
+                        for (let e = 0; e < s; e++) i.push(new Coords(t[a][e], r[a][e]));
+                        e.innerRings.push(i);
                     }
                 }
                 e.closeTheRings();

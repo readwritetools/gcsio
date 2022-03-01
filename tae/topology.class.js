@@ -1,11 +1,11 @@
 /* Copyright (c) 2022 Read Write Tools. */
 import Coords from '../util/coords.class.js';
 
-import expect from '../node_modules/softlib/expect.js';
+import expect from 'softlib/expect.js';
 
-import aver from '../node_modules/softlib/aver.js';
+import aver from 'softlib/aver.js';
 
-import terminal from '../node_modules/softlib/terminal.js';
+import terminal from 'softlib/terminal.js';
 
 import { PolygonRing } from '../gcs/gcs-polygon-feature.class.js';
 
@@ -77,11 +77,11 @@ export class Topology {
             var s = e.edgeRefs[0], t = Math.abs(s), o = this.taeEdges[t];
             s < 0 ? (r.push(o.coordsIndexB), r.push(o.coordsIndexA)) : (r.push(o.coordsIndexA), 
             r.push(o.coordsIndexB));
-            for (let a = 1; a < e.edgeRefs.length; a++) {
-                var i = e.edgeRefs[a], n = Math.abs(i), d = this.taeEdges[n];
-                o.forwardRing === d.forwardRing && o.reverseRing === d.reverseRing && r.length < 256 ? i < 0 ? r.push(d.coordsIndexA) : r.push(d.coordsIndexB) : (this.addArc(e, r), 
-                r = [], i < 0 ? (r.push(d.coordsIndexB), r.push(d.coordsIndexA)) : (r.push(d.coordsIndexA), 
-                r.push(d.coordsIndexB))), s = i, t = n, o = d;
+            for (let d = 1; d < e.edgeRefs.length; d++) {
+                var i = e.edgeRefs[d], n = Math.abs(i), a = this.taeEdges[n];
+                o.forwardRing === a.forwardRing && o.reverseRing === a.reverseRing && r.length < 255 ? i < 0 ? r.push(a.coordsIndexA) : r.push(a.coordsIndexB) : (this.addArc(e, r), 
+                r = [], i < 0 ? (r.push(a.coordsIndexB), r.push(a.coordsIndexA)) : (r.push(a.coordsIndexA), 
+                r.push(a.coordsIndexB))), s = i, t = n, o = a;
             }
             this.addArc(e, r);
         }

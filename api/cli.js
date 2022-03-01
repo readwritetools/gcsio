@@ -9,11 +9,11 @@ import * as FileAPI from './file-api.js';
 
 import GcsHoldingArea from '../gcs/gcs-holding-area.class.js';
 
-import Pfile from '../node_modules/iolib/pfile.class.js';
+import Pfile from 'iolib/pfile.class.js';
 
-import terminal from '../node_modules/softlib/terminal.js';
+import terminal from 'softlib/terminal.js';
 
-import expect from '../node_modules/softlib/expect.js';
+import expect from 'softlib/expect.js';
 
 export default class CLI {
     constructor() {
@@ -54,9 +54,9 @@ export default class CLI {
         s.includes(this.inputFormat) || this.usageAndExit(`--iformat option expected ${JSON.stringify(s)} but got ${this.inputFormat}`), 
         s.includes(this.outputFormat) || this.usageAndExit(`--oformat option expected ${JSON.stringify(s)} but got ${this.outputFormat}`), 
         (this.accuracy < 1 || this.accuracy > 6) && this.usageAndExit(`--accuracy option expected 1 to 6 (1=11km, 2=1100m, 3=110m†, 4=11m, 5=1.1m, 6=11cm) but got ${this.accuracy}`);
-        var o = this.properties.split(',');
+        var a = this.properties.split(',');
         return 0 == this.properties.length && this.usageAndExit(`--properties option should specify a comma-separated list of names from this list: ${JSON.stringify(validProperties)}`), 
-        this.properties = o, null != this.declarationsFile && '' != this.declarationsFile && (0 == this.declarationsFile.exists() && this.usageAndExit(`The declarations file does not exist "${this.declarationsFile.makeAbsolute().name}"`), 
+        this.properties = a, null != this.declarationsFile && '' != this.declarationsFile && (0 == this.declarationsFile.exists() && this.usageAndExit(`The declarations file does not exist "${this.declarationsFile.makeAbsolute().name}"`), 
         this.declarationsFile.isDirectory() && this.usageAndExit('Specify an declarations file, not a directory')), 
         !0;
     }
@@ -92,7 +92,7 @@ export default class CLI {
         }
     }
     exit(t) {
-        terminal.writeToConsoleOrStderr('\nSCIO | Spherical coordinates I/O: reading from and writing to files with longitude/latitude coordinates\n'), 
+        terminal.writeToConsoleOrStderr('\nGCSCIO | Geographic Coordinate System I/O: reading from and writing to files with longitude/latitude coordinates\n'), 
         terminal.writeToConsoleOrStderr(t + '\n'), process.exit(0);
     }
     buildDeclarations() {
@@ -101,11 +101,11 @@ export default class CLI {
         if (expect(this.declarationsFile, 'Pfile'), 0 == this.declarationsFile.exists()) return t;
         try {
             var i = fs.readFileSync(this.declarationsFile.name, 'utf8').split('\n');
-            for (let a = 0; a < i.length; a++) {
-                var e = i[a].trim();
+            for (let o = 0; o < i.length; o++) {
+                var e = i[o].trim();
                 if (0 != e.length && 0 != e.indexOf('//') && 0 != e.indexOf('#')) {
-                    var [s, o] = e.split('=');
-                    t.set(s.trim(), o.trim());
+                    var [s, a] = e.split('=');
+                    t.set(s.trim(), a.trim());
                 }
             }
         } catch (t) {

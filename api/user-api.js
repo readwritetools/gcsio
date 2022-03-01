@@ -11,9 +11,9 @@ import ByteEncodedSerializer from '../serializers/byte-encoded-serializer.class.
 
 import StringEncodedSerializer from '../serializers/string-encoded-serializer.class.js';
 
-import expect from '../node_modules/softlib/expect.js';
+import expect from 'softlib/expect.js';
 
-import terminal from '../node_modules/softlib/terminal.js';
+import terminal from 'softlib/terminal.js';
 
 export function parseGeojson(e, r, a) {
     return expect(r, 'String'), expect(a, 'Object'), new GeojsonParser(e).parseString(r);

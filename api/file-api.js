@@ -3,13 +3,13 @@ import fs from 'fs';
 
 import * as UserAPI from './user-api.js';
 
-import expect from '../node_modules/softlib/expect.js';
+import expect from 'softlib/expect.js';
 
-import aver from '../node_modules/softlib/aver.js';
+import aver from 'softlib/aver.js';
 
-import terminal from '../node_modules/softlib/terminal.js';
+import terminal from 'softlib/terminal.js';
 
-import Pfile from '../node_modules/iolib/pfile.class.js';
+import Pfile from 'iolib/pfile.class.js';
 
 export function readTextFile(e, r, t) {
     expect(e, 'GcsHoldingArea'), expect(r, 'String'), expect(t, 'Object'), aver([ 'geojson', 'gfe', 'ice', 'tae' ].includes(t.inputFormat));

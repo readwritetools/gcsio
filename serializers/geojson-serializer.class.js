@@ -1,11 +1,11 @@
 /* Copyright (c) 2022 Read Write Tools. */
 import StringBuilder from './builders/string-builder.class.js';
 
-import expect from '../node_modules/softlib/expect.js';
+import expect from 'softlib/expect.js';
 
-import aver from '../node_modules/softlib/aver.js';
+import aver from 'softlib/aver.js';
 
-import terminal from '../node_modules/softlib/terminal.js';
+import terminal from 'softlib/terminal.js';
 
 export default class GeojsonSerializer {
     constructor(e, t, r, i) {
