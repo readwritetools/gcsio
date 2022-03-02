@@ -68,8 +68,8 @@ export default class StringEncodedSerializer extends EncodedSerializer {
                 var t = this.topology.taeEdges[r], e = this.topology.taeCoords.lngLatFromCoordsIndex(t.coordsIndexA);
                 let n = this.toAccuracy(e.longitude), s = this.toAccuracy(e.latitude);
                 var i = this.topology.taeCoords.lngLatFromCoordsIndex(t.coordsIndexB);
-                let o = this.toAccuracy(i.longitude), a = this.toAccuracy(i.latitude), l = `${t.forwardRing.polygonName}-${t.forwardRing.type}`, g = null == t.reverseRing ? 'null' : `${t.reverseRing.polygonName}-${t.reverseRing.type}`;
-                this.stringBuilder.putline(`Edge[${r}] forwardMapKey(${t.forwardMapKey})  coordsA(${n},${s})  coordsB(${o},${a})  forward[${l}]   reverse[${g}]`);
+                let o = this.toAccuracy(i.longitude), a = this.toAccuracy(i.latitude), g = `${t.forwardRing.polygonName}-${t.forwardRing.type}`, l = null == t.reverseRing ? 'null' : `${t.reverseRing.polygonName}-${t.reverseRing.type}`;
+                this.stringBuilder.putline(`Edge[${r}] forwardMapKey(${t.forwardMapKey})  coordsA(${n},${s})  coordsB(${o},${a})  forward[${g}]   reverse[${l}]`);
             }
         }
     }
@@ -96,9 +96,9 @@ export default class StringEncodedSerializer extends EncodedSerializer {
         this.stringBuilder.putline(`${e} ${this.datasetId}`);
         const i = SectionMarker.toString(SectionMarker.GEOMETRY);
         this.stringBuilder.putline(`${i} ${t}`);
-        const r = SectionMarker.toString(SectionMarker.PROPERTIES), {propertyNames: n, propertyTypes: s} = this.getPropertyNamesAndTypes(this.propertiesToInclude, t), o = n.length;
-        this.stringBuilder.putline(`${r} ${o}`), this.stringBuilder.putline(n.join(',')), 
-        this.stringBuilder.putline(s.join(','));
+        const r = SectionMarker.toString(SectionMarker.PROPERTIES), {userRequestedProperties: n, propertyNames: s, propertyTypes: o} = this.getPropertyNamesAndTypes(this.propertiesToInclude, t), a = s.length;
+        return this.stringBuilder.putline(`${r} ${a}`), this.stringBuilder.putline(s.join(',')), 
+        this.stringBuilder.putline(o.join(',')), n;
     }
     beginFeatures(t) {
         const e = SectionMarker.toString(SectionMarker.FEATURES);
@@ -111,14 +111,18 @@ export default class StringEncodedSerializer extends EncodedSerializer {
     writePointDataset() {
         var t = this.gcsFeaturePoints.length;
         if (0 != t) {
-            this.writeDatasetPreliminaries('Point'), this.beginFeatures(t);
+            var e = this.writeDatasetPreliminaries('Point');
+            this.beginFeatures(t);
             for (let t of this.gcsFeaturePoints) {
                 if ('ice' == this.format) {
-                    var e = this.indexedCoordinates.getIceX(t.discretePoint.longitude), i = this.indexedCoordinates.getIceY(t.discretePoint.latitude);
-                    this.propertyToString('xCoord', e.toString()), this.propertyToString('yCoord', i.toString());
+                    var i = this.indexedCoordinates.getIceX(t.discretePoint.longitude), r = this.indexedCoordinates.getIceY(t.discretePoint.latitude);
+                    this.propertyToString('xCoord', i.toString()), this.propertyToString('yCoord', r.toString());
                 } else 'gfe' == this.format && (this.propertyToString('lngCoord', this.toAccuracy(t.discretePoint.longitude)), 
                 this.propertyToString('latCoord', this.toAccuracy(t.discretePoint.latitude)));
-                for (let e in t.kvPairs) this.isPropertyWanted(e) && this.propertyToString(e, t.kvPairs[e]);
+                for (let i = 0; i < e.length; i++) {
+                    var n = e[i];
+                    t.kvPairs.hasOwnProperty(n) ? this.propertyToString(n, t.kvPairs[n]) : this.propertyToString(n, '');
+                }
             }
             this.endFeatures();
         }
@@ -126,15 +130,19 @@ export default class StringEncodedSerializer extends EncodedSerializer {
     writeLineDataset() {
         var t = this.gcsFeatureLines.length;
         if (0 != t) {
-            this.writeDatasetPreliminaries('Line'), this.beginFeatures(t);
+            var e = this.writeDatasetPreliminaries('Line');
+            this.beginFeatures(t);
             for (let t of this.gcsFeatureLines) {
-                var e = [];
-                for (let i = 0; i < t.lineSegment.length; i++) this.buildLongitudes(e, t.lineSegment[i]);
-                'ice' == this.format ? this.propertyToString('xSegment', e) : 'gfe' == this.format && this.propertyToString('lngSegment', e), 
-                e = [];
-                for (let i = 0; i < t.lineSegment.length; i++) this.buildLatitudes(e, t.lineSegment[i]);
-                'ice' == this.format ? this.propertyToString('ySegment', e) : 'gfe' == this.format && this.propertyToString('latSegment', e);
-                for (let e in t.kvPairs) this.isPropertyWanted(e) && this.propertyToString(e, t.kvPairs[e]);
+                var i = [];
+                for (let e = 0; e < t.lineSegment.length; e++) this.buildLongitudes(i, t.lineSegment[e]);
+                'ice' == this.format ? this.propertyToString('xSegment', i) : 'gfe' == this.format && this.propertyToString('lngSegment', i), 
+                i = [];
+                for (let e = 0; e < t.lineSegment.length; e++) this.buildLatitudes(i, t.lineSegment[e]);
+                'ice' == this.format ? this.propertyToString('ySegment', i) : 'gfe' == this.format && this.propertyToString('latSegment', i);
+                for (let i = 0; i < e.length; i++) {
+                    var r = e[i];
+                    t.kvPairs.hasOwnProperty(r) ? this.propertyToString(r, t.kvPairs[r]) : this.propertyToString(r, '');
+                }
             }
             this.endFeatures();
         }
@@ -142,41 +150,45 @@ export default class StringEncodedSerializer extends EncodedSerializer {
     writePolygonDataset() {
         var t = this.gcsFeaturePolygons.length;
         if (0 != t) {
-            this.writeDatasetPreliminaries('Polygon'), this.beginFeatures(t);
+            var e = this.writeDatasetPreliminaries('Polygon');
+            this.beginFeatures(t);
             for (let t of this.gcsFeaturePolygons) {
                 if ('ice' == this.format || 'gfe' == this.format) {
-                    var e = new Array;
-                    this.addLongitudeLinearRing(e, t.outerRing);
-                    for (let i = 0; i < t.innerRings.length; i++) this.addLongitudeLinearRing(e, t.innerRings[i]);
-                    'ice' == this.format ? this.propertyToString('xRings', e) : 'gfe' == this.format && this.propertyToString('lngRings', e), 
-                    e = new Array, this.addLatitudeLinearRing(e, t.outerRing);
-                    for (let i = 0; i < t.innerRings.length; i++) this.addLatitudeLinearRing(e, t.innerRings[i]);
-                    'ice' == this.format ? this.propertyToString('yRings', e) : 'gfe' == this.format && this.propertyToString('latRings', e);
+                    var i = new Array;
+                    this.addLongitudeLinearRing(i, t.outerRing);
+                    for (let e = 0; e < t.innerRings.length; e++) this.addLongitudeLinearRing(i, t.innerRings[e]);
+                    'ice' == this.format ? this.propertyToString('xRings', i) : 'gfe' == this.format && this.propertyToString('lngRings', i), 
+                    i = new Array, this.addLatitudeLinearRing(i, t.outerRing);
+                    for (let e = 0; e < t.innerRings.length; e++) this.addLatitudeLinearRing(i, t.innerRings[e]);
+                    'ice' == this.format ? this.propertyToString('yRings', i) : 'gfe' == this.format && this.propertyToString('latRings', i);
                 }
                 if ('tae' == this.format) {
                     if (this.debugTopology) {
-                        e = new Array;
-                        this.addEdgeRefs(e, t.outerRing);
-                        for (let i = 0; i < t.innerRings.length; i++) this.addEdgeRefs(e, t.innerRings[i]);
-                        this.propertyToString('edgeRefs', e);
+                        i = new Array;
+                        this.addEdgeRefs(i, t.outerRing);
+                        for (let e = 0; e < t.innerRings.length; e++) this.addEdgeRefs(i, t.innerRings[e]);
+                        this.propertyToString('edgeRefs', i);
                     }
                     if (this.debugTopology) {
-                        e = new Array;
-                        this.addEdges(e, t.outerRing);
-                        for (let i = 0; i < t.innerRings.length; i++) this.addEdges(e, t.innerRings[i]);
-                        this.propertyToString('edgePairs', e);
+                        i = new Array;
+                        this.addEdges(i, t.outerRing);
+                        for (let e = 0; e < t.innerRings.length; e++) this.addEdges(i, t.innerRings[e]);
+                        this.propertyToString('edgePairs', i);
                     }
-                    e = new Array;
-                    this.addArcRefs(e, t.outerRing);
-                    for (let i = 0; i < t.innerRings.length; i++) this.addArcRefs(e, t.innerRings[i]);
-                    if (this.propertyToString('arcRefs', e), this.debugTopology) {
-                        e = new Array;
-                        this.addArcCoords(e, t.outerRing);
-                        for (let i = 0; i < t.innerRings.length; i++) this.addArcCoords(e, t.innerRings[i]);
-                        this.propertyToString('arcCoords', e);
+                    i = new Array;
+                    this.addArcRefs(i, t.outerRing);
+                    for (let e = 0; e < t.innerRings.length; e++) this.addArcRefs(i, t.innerRings[e]);
+                    if (this.propertyToString('arcRefs', i), this.debugTopology) {
+                        i = new Array;
+                        this.addArcCoords(i, t.outerRing);
+                        for (let e = 0; e < t.innerRings.length; e++) this.addArcCoords(i, t.innerRings[e]);
+                        this.propertyToString('arcCoords', i);
                     }
                 }
-                for (let e in t.kvPairs) this.isPropertyWanted(e) && this.propertyToString(e, t.kvPairs[e]);
+                for (let i = 0; i < e.length; i++) {
+                    var r = e[i];
+                    t.kvPairs.hasOwnProperty(r) ? this.propertyToString(r, t.kvPairs[r]) : this.propertyToString(r, '');
+                }
             }
             this.endFeatures();
         }

@@ -43,6 +43,7 @@ export default class EncodedSerializer {
         var o = [];
         for (let e = 0; e < i.length; e++) o.push(this.getPropertyType(i[e]));
         return {
+            userRequestedProperties: s,
             propertyNames: i,
             propertyTypes: o
         };

@@ -86,10 +86,11 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
         this.byteBuilder.writeMarker(t), this.byteBuilder.writeLenPrefixedText(this.datasetId);
         const i = SectionMarker.toBin(SectionMarker.GEOMETRY);
         this.byteBuilder.writeMarker(i), this.byteBuilder.writeLenPrefixedText(e);
-        const r = SectionMarker.toBin(SectionMarker.PROPERTIES), {propertyNames: n, propertyTypes: s} = this.getPropertyNamesAndTypes(this.propertiesToInclude, e), o = n.length;
-        this.byteBuilder.writeMarker(r), this.byteBuilder.writeUint8(o);
-        for (let e = 0; e < n.length; e++) this.byteBuilder.writeLenPrefixedText(n[e]);
+        const r = SectionMarker.toBin(SectionMarker.PROPERTIES), {userRequestedProperties: n, propertyNames: s, propertyTypes: o} = this.getPropertyNamesAndTypes(this.propertiesToInclude, e), a = s.length;
+        this.byteBuilder.writeMarker(r), this.byteBuilder.writeUint8(a);
         for (let e = 0; e < s.length; e++) this.byteBuilder.writeLenPrefixedText(s[e]);
+        for (let e = 0; e < o.length; e++) this.byteBuilder.writeLenPrefixedText(o[e]);
+        return n;
     }
     beginFeatures(e) {
         const t = SectionMarker.toBin(SectionMarker.FEATURES);
@@ -102,12 +103,16 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
     writePointDataset() {
         var e = this.gcsFeaturePoints.length;
         if (0 != e) {
-            this.writeDatasetPreliminaries('Point'), this.beginFeatures(e);
+            var t = this.writeDatasetPreliminaries('Point');
+            this.beginFeatures(e);
             for (let e of this.gcsFeaturePoints) {
                 'icebin' == this.format ? (this.propertyToBin('xCoord', e.discretePoint, this.indexedCoordinates.packedWidth), 
                 this.propertyToBin('yCoord', e.discretePoint, this.indexedCoordinates.packedWidth)) : 'gfebin' == this.format && (this.propertyToBin('lngCoord', e.discretePoint), 
                 this.propertyToBin('latCoord', e.discretePoint));
-                for (let t in e.kvPairs) this.isPropertyWanted(t) && this.propertyToBin(t, e.kvPairs[t]);
+                for (let r = 0; r < t.length; r++) {
+                    var i = t[r];
+                    e.kvPairs.hasOwnProperty(i) ? this.propertyToBin(i, e.kvPairs[i]) : this.propertyToBin(i, 0);
+                }
             }
             this.endFeatures();
         }
@@ -115,12 +120,16 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
     writeLineDataset() {
         var e = this.gcsFeatureLines.length;
         if (0 != e) {
-            this.writeDatasetPreliminaries('Line'), this.beginFeatures(e);
+            var t = this.writeDatasetPreliminaries('Line');
+            this.beginFeatures(e);
             for (let e of this.gcsFeatureLines) {
                 'icebin' == this.format ? (this.propertyToBin('xSegment', e.lineSegment, this.indexedCoordinates.packedWidth), 
                 this.propertyToBin('ySegment', e.lineSegment, this.indexedCoordinates.packedWidth)) : 'gfebin' == this.format && (this.propertyToBin('lngSegment', e.lineSegment), 
                 this.propertyToBin('latSegment', e.lineSegment));
-                for (let t in e.kvPairs) this.isPropertyWanted(t) && this.propertyToBin(t, e.kvPairs[t]);
+                for (let r = 0; r < t.length; r++) {
+                    var i = t[r];
+                    e.kvPairs.hasOwnProperty(i) ? this.propertyToBin(i, e.kvPairs[i]) : this.propertyToBin(i, 0);
+                }
             }
             this.endFeatures();
         }
@@ -128,22 +137,26 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
     writePolygonDataset() {
         var e = this.gcsFeaturePolygons.length;
         if (0 != e) {
-            this.writeDatasetPreliminaries('Polygon'), this.beginFeatures(e);
+            var t = this.writeDatasetPreliminaries('Polygon');
+            this.beginFeatures(e);
             for (let e of this.gcsFeaturePolygons) {
                 if ('icebin' == this.format || 'gfebin' == this.format) {
-                    var t = 1 + e.innerRings.length;
-                    this.byteBuilder.writeUint8(t), this.writeLongitudeLinearRing(e.outerRing);
+                    var i = 1 + e.innerRings.length;
+                    this.byteBuilder.writeUint8(i), this.writeLongitudeLinearRing(e.outerRing);
                     for (let t = 0; t < e.innerRings.length; t++) this.writeLongitudeLinearRing(e.innerRings[t]);
-                    t = 1 + e.innerRings.length;
-                    this.byteBuilder.writeUint8(t), this.writeLatitudeLinearRing(e.outerRing);
+                    i = 1 + e.innerRings.length;
+                    this.byteBuilder.writeUint8(i), this.writeLatitudeLinearRing(e.outerRing);
                     for (let t = 0; t < e.innerRings.length; t++) this.writeLatitudeLinearRing(e.innerRings[t]);
                 }
                 if ('taebin' == this.format) {
-                    t = 1 + e.innerRings.length;
-                    this.byteBuilder.writeUint8(t), this.writeRingArcRefs(e.outerRing);
+                    i = 1 + e.innerRings.length;
+                    this.byteBuilder.writeUint8(i), this.writeRingArcRefs(e.outerRing);
                     for (let t = 0; t < e.innerRings.length; t++) this.writeRingArcRefs(e.innerRings[t]);
                 }
-                for (let t in e.kvPairs) this.isPropertyWanted(t) && this.propertyToBin(t, e.kvPairs[t]);
+                for (let i = 0; i < t.length; i++) {
+                    var r = t[i];
+                    e.kvPairs.hasOwnProperty(r) ? this.propertyToBin(r, e.kvPairs[r]) : this.propertyToBin(r, 0);
+                }
             }
             this.endFeatures();
         }

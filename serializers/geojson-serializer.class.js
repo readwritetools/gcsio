@@ -90,10 +90,13 @@ export default class GeojsonSerializer {
     }
     writeProperties(e, t) {
         expect(e, 'Object'), expect(t, [ 'GcsPointFeature', 'GcsLineFeature', 'GcsPolygonFeature' ]);
-        for (let i in t.kvPairs) {
+        for (let i in t.kvPairs) if (this.isPropertyWanted(i)) {
             var r = t.kvPairs[i];
             e[i] = this.writeWithAccuracy(r);
         }
+    }
+    isPropertyWanted(e) {
+        return !this.propertiesToInclude.includes('none') && (!!this.propertiesToInclude.includes('all') || !!this.propertiesToInclude.includes(e));
     }
     writeWithAccuracy(e) {
         return null == e ? 'null' : 'Number' != e.constructor.name || Number.isInteger(e) ? e : Number(e.toFixed(this.accuracy));

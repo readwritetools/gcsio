@@ -3,11 +3,11 @@ import GcsBaseFeature from './gcs-base-feature.class.js';
 
 import Coords from '../util/coords.class.js';
 
-import expect from '../node_modules/softlib/expect.js';
-
 import { ArcRefs } from '../tae/topology.class.js';
 
 import { EdgeRefs } from '../tae/topology.class.js';
+
+import expect from 'softlib/expect.js';
 
 export class GcsPolygonFeature extends GcsBaseFeature {
     constructor() {
