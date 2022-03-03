@@ -111,7 +111,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
                 this.propertyToBin('latCoord', e.discretePoint));
                 for (let r = 0; r < t.length; r++) {
                     var i = t[r];
-                    e.kvPairs.hasOwnProperty(i) ? this.propertyToBin(i, e.kvPairs[i]) : this.propertyToBin(i, 0);
+                    e.kvPairs.hasOwnProperty(i) ? this.propertyToBin(i, e.kvPairs[i]) : this.propertyToBin(i, null);
                 }
             }
             this.endFeatures();
@@ -128,7 +128,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
                 this.propertyToBin('latSegment', e.lineSegment));
                 for (let r = 0; r < t.length; r++) {
                     var i = t[r];
-                    e.kvPairs.hasOwnProperty(i) ? this.propertyToBin(i, e.kvPairs[i]) : this.propertyToBin(i, 0);
+                    e.kvPairs.hasOwnProperty(i) ? this.propertyToBin(i, e.kvPairs[i]) : this.propertyToBin(i, null);
                 }
             }
             this.endFeatures();
@@ -155,7 +155,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
                 }
                 for (let i = 0; i < t.length; i++) {
                     var r = t[i];
-                    e.kvPairs.hasOwnProperty(r) ? this.propertyToBin(r, e.kvPairs[r]) : this.propertyToBin(r, 0);
+                    e.kvPairs.hasOwnProperty(r) ? this.propertyToBin(r, e.kvPairs[r]) : this.propertyToBin(r, null);
                 }
             }
             this.endFeatures();
@@ -179,7 +179,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
     propertyToBin(e, t, i) {
         expect(i, [ 'Number', 'undefined' ]);
         var r = this.getPropertyType(e);
-        switch (r) {
+        switch (null == t && -1 != r.indexOf('[]') && (t = []), r) {
           case 'xCoord':
             var n = this.indexedCoordinates.getIceX(t.longitude);
             return void (2 == i ? this.byteBuilder.writeUint16(n) : this.byteBuilder.writeUint32(n));
@@ -300,7 +300,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             return;
 
           case 'json':
-            return void (null == t || null == t ? this.byteBuilder.writeLenPrefixedText('{}') : this.byteBuilder.writeLenPrefixedText(JSON.stringify(t)));
+            return void (null == t || null == t || '' == t ? this.byteBuilder.writeLenPrefixedText('{}') : this.byteBuilder.writeLenPrefixedText(JSON.stringify(t)));
 
           default:
             return terminal.trace(`Ignoring unknown property type ${r} for property pair ${e} = ${t}`), 

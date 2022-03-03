@@ -68,8 +68,8 @@ export default class StringEncodedSerializer extends EncodedSerializer {
                 var t = this.topology.taeEdges[r], e = this.topology.taeCoords.lngLatFromCoordsIndex(t.coordsIndexA);
                 let n = this.toAccuracy(e.longitude), s = this.toAccuracy(e.latitude);
                 var i = this.topology.taeCoords.lngLatFromCoordsIndex(t.coordsIndexB);
-                let o = this.toAccuracy(i.longitude), a = this.toAccuracy(i.latitude), g = `${t.forwardRing.polygonName}-${t.forwardRing.type}`, l = null == t.reverseRing ? 'null' : `${t.reverseRing.polygonName}-${t.reverseRing.type}`;
-                this.stringBuilder.putline(`Edge[${r}] forwardMapKey(${t.forwardMapKey})  coordsA(${n},${s})  coordsB(${o},${a})  forward[${g}]   reverse[${l}]`);
+                let o = this.toAccuracy(i.longitude), a = this.toAccuracy(i.latitude), l = `${t.forwardRing.polygonName}-${t.forwardRing.type}`, g = null == t.reverseRing ? 'null' : `${t.reverseRing.polygonName}-${t.reverseRing.type}`;
+                this.stringBuilder.putline(`Edge[${r}] forwardMapKey(${t.forwardMapKey})  coordsA(${n},${s})  coordsB(${o},${a})  forward[${l}]   reverse[${g}]`);
             }
         }
     }
@@ -308,7 +308,7 @@ export default class StringEncodedSerializer extends EncodedSerializer {
             return expect(e, 'Array'), void (0 == e.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.map((t => Math.round(t))).join(',')));
 
           case 'float':
-            return void (null == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.toFixed(this.accuracy)));
+            return void (null == e || null == e || '' == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.toFixed(this.accuracy)));
 
           case 'float[]':
             return expect(e, 'Array'), void (0 == e.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.map((t => t.toFixed(this.accuracy))).join(',')));
@@ -320,7 +320,7 @@ export default class StringEncodedSerializer extends EncodedSerializer {
             return void (null == e || 0 == e.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(JSON.stringify(e)));
 
           case 'json':
-            return void (null == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(JSON.stringify(e)));
+            return void (null == e || null == e || '' == e ? this.stringBuilder.putline('{}') : this.stringBuilder.putline(JSON.stringify(e)));
 
           default:
             return terminal.trace(`Ignoring unknown property name ${t} with value ${e}`), void this.stringBuilder.putline('');
