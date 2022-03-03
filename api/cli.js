@@ -5,7 +5,9 @@ import { dirname } from 'path';
 
 import { fileURLToPath } from 'url';
 
-import * as FileAPI from './file-api.js';
+import { readTextFile, readBinaryFile } from './file-reader.js';
+
+import { writeTextFile, writeBinaryFile } from './file-writer.js';
 
 import GcsHoldingArea from '../gcs/gcs-holding-area.class.js';
 
@@ -127,26 +129,26 @@ export default class CLI {
           case 'gfe':
           case 'ice':
           case 'tae':
-            i = FileAPI.readTextFile(this.gcsHoldingArea, this.inputFile.name, t);
+            i = readTextFile(this.gcsHoldingArea, this.inputFile.name, t);
             break;
 
           case 'gfebin':
           case 'icebin':
           case 'taebin':
-            i = FileAPI.readBinaryFile(this.gcsHoldingArea, this.inputFile.name, t);
+            i = readBinaryFile(this.gcsHoldingArea, this.inputFile.name, t);
         }
         switch (i || process.exit(1), this.outputFormat) {
           case 'geojson':
           case 'gfe':
           case 'ice':
           case 'tae':
-            i = FileAPI.writeTextFile(this.gcsHoldingArea, this.outputFile.name, t);
+            i = writeTextFile(this.gcsHoldingArea, this.outputFile.name, t);
             break;
 
           case 'gfebin':
           case 'icebin':
           case 'taebin':
-            i = FileAPI.writeBinaryFile(this.gcsHoldingArea, this.outputFile.name, t);
+            i = writeBinaryFile(this.gcsHoldingArea, this.outputFile.name, t);
         }
         i ? process.exit(0) : process.exit(1);
     }
