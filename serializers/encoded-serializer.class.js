@@ -6,12 +6,12 @@ import aver from 'softlib/aver.js';
 import terminal from 'softlib/terminal.js';
 
 export default class EncodedSerializer {
-    constructor(e, t, s, i, o, r) {
-        expect(e, 'GcsHoldingArea'), expect(t, 'String'), expect(s, 'Number'), expect(i, 'String'), 
+    constructor(e, t, i, s, o, r) {
+        expect(e, 'GcsHoldingArea'), expect(t, 'String'), expect(i, 'Number'), expect(s, 'String'), 
         expect(o, 'Array'), expect(r, 'Map'), this.gcsFeaturePoints = e.gcsFeaturePoints, 
         this.gcsFeatureLines = e.gcsFeatureLines, this.gcsFeaturePolygons = e.gcsFeaturePolygons, 
         this.indexedCoordinates = e.indexedCoordinates, this.topology = e.topology, this.format = t, 
-        this.accuracy = s, this.datasetId = i, this.propertiesToInclude = o, this.declarations = r, 
+        this.accuracy = i, this.datasetId = s, this.propertiesToInclude = o, this.declarations = r, 
         this.debugTopology = !1, this.buildDeclarations();
     }
     serialize() {
@@ -19,8 +19,7 @@ export default class EncodedSerializer {
             switch (this.writeProlog(), this.format) {
               case 'ice':
               case 'icebin':
-                this.indexedCoordinates.buildPoints(this.gcsFeaturePoints), this.indexedCoordinates.buildLines(this.gcsFeatureLines), 
-                this.indexedCoordinates.buildPolygons(this.gcsFeaturePolygons), this.writeMeridiansAndParallels();
+                this.buildPoints(), this.buildLines(), this.buildPolygons(), this.writeMeridiansAndParallels();
                 break;
 
               case 'tae':
@@ -34,17 +33,36 @@ export default class EncodedSerializer {
             return terminal.caught(e), null;
         }
     }
+    buildPoints() {
+        for (let e of this.gcsFeaturePoints) this.indexedCoordinates.registerLongitude(e.discretePoint.longitude), 
+        this.indexedCoordinates.registerLatitude(e.discretePoint.latitude);
+    }
+    buildLines() {
+        for (let e of this.gcsFeatureLines) for (let t = 0; t < e.lineSegment.length; t++) this.indexedCoordinates.registerLongitude(e.lineSegment[t].longitude), 
+        this.indexedCoordinates.registerLatitude(e.lineSegment[t].latitude);
+    }
+    buildPolygons() {
+        for (let t of this.gcsFeaturePolygons) {
+            for (let e = 0; e < t.outerRing.length; e++) this.indexedCoordinates.registerLongitude(t.outerRing[e].longitude), 
+            this.indexedCoordinates.registerLatitude(t.outerRing[e].latitude);
+            for (let i = 0; i < t.innerRings.length; i++) {
+                var e = t.innerRings[i];
+                for (let t = 0; t < e.length; t++) this.indexedCoordinates.registerLongitude(e[t].longitude), 
+                this.indexedCoordinates.registerLatitude(e[t].latitude);
+            }
+        }
+    }
     getPropertyNamesAndTypes(e, t) {
         expect(e, 'Array'), expect(t, 'String');
-        var s = [ ...e ];
-        s = e.includes('all') ? this.examineHoldingAreaForProperties(t) : e.includes('none') ? [] : [ ...e ];
-        var i = [];
-        'ice' == this.format || 'icebin' == this.format ? 'Point' == t ? i = [ 'xCoord', 'yCoord', ...s ] : 'Line' == t ? i = [ 'xSegment', 'ySegment', ...s ] : 'Polygon' == t && (i = [ 'xRings', 'yRings', ...s ]) : 'gfe' == this.format || 'gfebin' == this.format ? 'Point' == t ? i = [ 'lngCoord', 'latCoord', ...s ] : 'Line' == t ? i = [ 'lngSegment', 'latSegment', ...s ] : 'Polygon' == t && (i = [ 'lngRings', 'latRings', ...s ]) : 'tae' == this.format || 'taebin' == this.format ? 'Polygon' == t && (i = this.debugTopology ? [ 'edgeRefs', 'edgePairs', 'arcRefs', 'arcCoords', ...s ] : [ 'arcRefs', ...s ]) : terminal.logic(`expected 'gfe' or 'gfebin', 'ice', 'icebin', 'tae' or 'taebin' but got ${this.format}`);
+        var i = [ ...e ];
+        i = e.includes('all') ? this.examineHoldingAreaForProperties(t) : e.includes('none') ? [] : [ ...e ];
+        var s = [];
+        'ice' == this.format || 'icebin' == this.format ? 'Point' == t ? s = [ 'xCoord', 'yCoord', ...i ] : 'Line' == t ? s = [ 'xSegment', 'ySegment', ...i ] : 'Polygon' == t && (s = [ 'xRings', 'yRings', ...i ]) : 'gfe' == this.format || 'gfebin' == this.format ? 'Point' == t ? s = [ 'lngCoord', 'latCoord', ...i ] : 'Line' == t ? s = [ 'lngSegment', 'latSegment', ...i ] : 'Polygon' == t && (s = [ 'lngRings', 'latRings', ...i ]) : 'tae' == this.format || 'taebin' == this.format ? 'Polygon' == t && (s = this.debugTopology ? [ 'edgeRefs', 'edgePairs', 'arcRefs', 'arcCoords', ...i ] : [ 'arcRefs', ...i ]) : terminal.logic(`expected 'gfe' or 'gfebin', 'ice', 'icebin', 'tae' or 'taebin' but got ${this.format}`);
         var o = [];
-        for (let e = 0; e < i.length; e++) o.push(this.getPropertyType(i[e]));
+        for (let e = 0; e < s.length; e++) o.push(this.getPropertyType(s[e]));
         return {
-            userRequestedProperties: s,
-            propertyNames: i,
+            userRequestedProperties: i,
+            propertyNames: s,
             propertyTypes: o
         };
     }
@@ -68,8 +86,8 @@ export default class EncodedSerializer {
         expect(e, 'String');
         var t = {};
         'Point' == e && this.gcsFeaturePoints.length > 0 ? t = this.gcsFeaturePoints[0].kvPairs : 'Line' == e && this.gcsFeatureLines.length > 0 ? t = this.gcsFeatureLines[0].kvPairs : 'Polygon' == e && this.gcsFeaturePolygons.length > 0 ? t = this.gcsFeaturePolygons[0].kvPairs : terminal.logic(`Unexpected geometry type ${e} (or no features)`);
-        var s = [];
-        for (let e in t) s.push(e);
-        return s;
+        var i = [];
+        for (let e in t) i.push(e);
+        return i;
     }
 }

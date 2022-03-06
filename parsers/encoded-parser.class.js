@@ -37,7 +37,7 @@ export default class EncodedParser {
         for (var t = this.readProlog(); 1 == t; ) t = this.readPayload();
         this.gcsHoldingArea.resetIndexedCoordinates(), this.gcsHoldingArea.resetTopology();
         var r = this.payloadLength - this.payloadOffset;
-        return 0 == r || (terminal.trace(`Premature end of parsing, ${r} bytes at end of file were not parsed`), 
+        return 0 == r || (terminal.abnormal(`Premature end of parsing, ${r} bytes at end of file were not parsed`), 
         !1);
     }
     readProlog(e) {
@@ -45,44 +45,48 @@ export default class EncodedParser {
         switch (this.format) {
           case 'gfe':
             return expect(this.payload, 'String'), r = t + SectionMarker.GFE_PROLOG[1].length, 
-            s = this.payload.substring(t, r), this.payloadOffset = r + 1, s == SectionMarker.GFE_PROLOG[1];
+            s = this.payload.substring(t, r), this.payloadOffset = r + 1, this.prologSanityCheck(s, SectionMarker.GFE_PROLOG[1]);
 
           case 'gfebin':
             return expect(this.payload, 'DataView'), r = t + SectionMarker.GFE_PROLOG[0].length, 
             s = (new TextDecoder).decode(this.payload.buffer.slice(t, r)), this.payloadOffset = r, 
-            s == SectionMarker.GFE_PROLOG[0];
+            this.prologSanityCheck(s, SectionMarker.GFE_PROLOG[0]);
 
           case 'ice':
             return expect(this.payload, 'String'), r = t + SectionMarker.ICE_PROLOG[1].length, 
-            s = this.payload.substring(t, r), this.payloadOffset = r + 1, s == SectionMarker.ICE_PROLOG[1];
+            s = this.payload.substring(t, r), this.payloadOffset = r + 1, this.prologSanityCheck(s, SectionMarker.ICE_PROLOG[1]);
 
           case 'icebin':
             return expect(this.payload, 'DataView'), r = t + SectionMarker.ICE_PROLOG[0].length, 
             s = (new TextDecoder).decode(this.payload.buffer.slice(t, r)), this.payloadOffset = r, 
-            s == SectionMarker.ICE_PROLOG[0];
+            this.prologSanityCheck(s, SectionMarker.ICE_PROLOG[0]);
 
           case 'tae':
             return expect(this.payload, 'String'), r = t + SectionMarker.TAE_PROLOG[1].length, 
             s = this.payload.substring(t, r), this.payloadOffset = r + 1, s == SectionMarker.TAE_PROLOG[2] ? (terminal.trace(`This file was created with ${SectionMarker.TAE_PROLOG[2]}`), 
-            !1) : s == SectionMarker.TAE_PROLOG[1];
+            !1) : this.prologSanityCheck(s, SectionMarker.TAE_PROLOG[1]);
 
           case 'taebin':
             return expect(this.payload, 'DataView'), r = t + SectionMarker.TAE_PROLOG[0].length, 
             s = (new TextDecoder).decode(this.payload.buffer.slice(t, r)), this.payloadOffset = r, 
-            s == SectionMarker.TAE_PROLOG[0];
+            this.prologSanityCheck(s, SectionMarker.TAE_PROLOG[0]);
 
           default:
             terminal.logic(`expected 'gfe', 'gfebin', 'ice', 'icebin', 'tae' or 'taebin' but got ${this.format}`);
         }
     }
+    prologSanityCheck(e, t) {
+        return t == e || (terminal.abnormal(`Expected ${t} but found ${e} while reading package prolog`), 
+        !1);
+    }
     readFeatures() {
         expect(this.numFeatures, 'Number'), aver(this.numFeatures >= 0);
-        for (let i = 0; i < this.numFeatures; i++) {
+        for (let a = 0; a < this.numFeatures; a++) {
             var e = this.createFeature(), t = new Array, r = new Array;
-            for (let i = 0; i < this.numProperties; i++) {
-                var s = this.propertyNames[i], a = this.propertyTypes[i];
+            for (let a = 0; a < this.numProperties; a++) {
+                var s = this.propertyNames[a], o = this.propertyTypes[a];
                 try {
-                    if (0 == this.readFeatureProperties(e, s, a, t, r)) return !1;
+                    if (0 == this.readFeatureProperties(e, s, o, t, r)) return !1;
                 } catch (e) {
                     return terminal.caught(e), !1;
                 }
@@ -90,17 +94,17 @@ export default class EncodedParser {
             if (aver(t.length == r.length), 'Point' == this.geometryType) e.discretePoint = new Coords(t[0], r[0]); else if ('Line' == this.geometryType) {
                 aver(t.length == r.length);
                 let s = t.length;
-                for (let a = 0; a < s; a++) e.lineSegment.push(new Coords(t[a], r[a]));
+                for (let o = 0; o < s; o++) e.lineSegment.push(new Coords(t[o], r[o]));
             } else if ('Polygon' == this.geometryType) {
                 aver(t.length == r.length);
                 let s = t.length;
-                for (let a = 0; a < s; a++) {
-                    aver(t[a].length == r[a].length);
-                    let s = t[a].length;
-                    if (0 == a) for (let a = 0; a < s; a++) e.outerRing.push(new Coords(t[0][a], r[0][a])); else {
-                        let i = new PolygonRing;
-                        for (let e = 0; e < s; e++) i.push(new Coords(t[a][e], r[a][e]));
-                        e.innerRings.push(i);
+                for (let o = 0; o < s; o++) {
+                    aver(t[o].length == r[o].length);
+                    let s = t[o].length;
+                    if (0 == o) for (let o = 0; o < s; o++) e.outerRing.push(new Coords(t[0][o], r[0][o])); else {
+                        let a = new PolygonRing;
+                        for (let e = 0; e < s; e++) a.push(new Coords(t[o][e], r[o][e]));
+                        e.innerRings.push(a);
                     }
                 }
                 e.closeTheRings();

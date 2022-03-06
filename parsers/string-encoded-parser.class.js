@@ -70,7 +70,7 @@ export default class StringEncodedParser extends EncodedParser {
             if ('ice' != this.format) return terminal.logic(`Geoplex Feature Encoding (GFE) must not have a meridians section ${this.url}`), 
             !1;
             var e = Math.fround(Number(this.readLine()));
-            this.indexedCoordinates.registerLongitude(e);
+            this.indexedCoordinates.addLongitude(e);
         }
         return aver(this.numMeridians == this.indexedCoordinates.meridians.length), !0;
     }
@@ -80,7 +80,7 @@ export default class StringEncodedParser extends EncodedParser {
             if ('ice' != this.format) return terminal.logic(`Geoplex Feature Encoding (GFE) must not have a parallels section ${this.url}`), 
             !1;
             var e = Math.fround(Number(this.readLine()));
-            this.indexedCoordinates.registerLatitude(e);
+            this.indexedCoordinates.addLatitude(e);
         }
         return aver(this.numParallels == this.indexedCoordinates.parallels.length), !0;
     }
