@@ -73,11 +73,12 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
         }
     }
     determineBitsNeededForArcs() {
-        for (let e of this.gcsFeaturePolygons) {
-            Math.max(0, e.outerRing.arcRefs);
-            for (let t = 0; t < e.innerRings.length; t++) Math.max(0, e.innerRings[t].arcRefs);
+        var e = 0;
+        for (let t of this.gcsFeaturePolygons) {
+            e = Math.max(e, t.outerRing.arcRefs);
+            for (let i = 0; i < t.innerRings.length; i++) e = Math.max(e, t.innerRings[i].arcRefs.length);
         }
-        this.arcRefLenBits = 8, this.topology.taeArcs.length < 32767 ? this.arcIndexLenBits = 16 : this.arcIndexLenBits = 32, 
+        this.arcRefLenBits = e <= 255 ? 8 : e <= 65536 ? 16 : 32, this.topology.taeArcs.length < 32767 ? this.arcIndexLenBits = 16 : this.arcIndexLenBits = 32, 
         this.topology.taeCoords.length < 65536 ? this.coordsIndexLenBits = 16 : this.coordsIndexLenBits = 32;
     }
     writeDatasetPreliminaries(e) {
@@ -142,15 +143,15 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             for (let e of this.gcsFeaturePolygons) {
                 if ('icebin' == this.format || 'gfebin' == this.format) {
                     var i = 1 + e.innerRings.length;
-                    this.byteBuilder.writeUint8(i), this.writeLongitudeLinearRing(e.outerRing);
+                    this.byteBuilder.writeUint16(i), this.writeLongitudeLinearRing(e.outerRing);
                     for (let t = 0; t < e.innerRings.length; t++) this.writeLongitudeLinearRing(e.innerRings[t]);
                     i = 1 + e.innerRings.length;
-                    this.byteBuilder.writeUint8(i), this.writeLatitudeLinearRing(e.outerRing);
+                    this.byteBuilder.writeUint16(i), this.writeLatitudeLinearRing(e.outerRing);
                     for (let t = 0; t < e.innerRings.length; t++) this.writeLatitudeLinearRing(e.innerRings[t]);
                 }
                 if ('taebin' == this.format) {
                     i = 1 + e.innerRings.length;
-                    this.byteBuilder.writeUint8(i), this.writeRingArcRefs(e.outerRing);
+                    this.byteBuilder.writeUint16(i), this.writeRingArcRefs(e.outerRing);
                     for (let t = 0; t < e.innerRings.length; t++) this.writeRingArcRefs(e.innerRings[t]);
                 }
                 for (let i = 0; i < t.length; i++) {
@@ -164,7 +165,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
     writeRingArcRefs(e) {
         expect(e, 'PolygonRing'), aver('taebin' == this.format);
         var t = e.arcRefs.length;
-        8 == this.arcRefLenBits ? this.byteBuilder.writeUint8(t) : this.byteBuilder.writeUint16(t);
+        8 == this.arcRefLenBits ? this.byteBuilder.writeUint8(t) : 16 == this.arcRefLenBits ? this.byteBuilder.writeUint16(t) : this.byteBuilder.writeUint32(t);
         for (let r = 0; r < t; r++) {
             var i = e.arcRefs[r];
             16 == this.arcIndexLenBits ? this.byteBuilder.writeInt16(i) : this.byteBuilder.writeInt32(i);
@@ -189,7 +190,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             return void (2 == i ? this.byteBuilder.writeUint16(s) : this.byteBuilder.writeUint32(s));
 
           case 'xSegment':
-            expect(t, 'Array'), aver(t.length <= 65536), this.byteBuilder.writeUint16(t.length);
+            expect(t, 'Array'), this.byteBuilder.writeUint32(t.length);
             for (let e = 0; e < t.length; e++) {
                 n = this.indexedCoordinates.getIceX(t[e].longitude);
                 2 == i ? this.byteBuilder.writeUint16(n) : this.byteBuilder.writeUint32(n);
@@ -197,7 +198,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             return;
 
           case 'ySegment':
-            expect(t, 'Array'), aver(t.length <= 65536), this.byteBuilder.writeUint16(t.length);
+            expect(t, 'Array'), this.byteBuilder.writeUint32(t.length);
             for (let e = 0; e < t.length; e++) {
                 s = this.indexedCoordinates.getIceY(t[e].latitude);
                 2 == i ? this.byteBuilder.writeUint16(s) : this.byteBuilder.writeUint32(s);
@@ -205,7 +206,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             return;
 
           case 'xRings':
-            expect(t, 'PolygonRing'), aver(t.length <= 65536), this.byteBuilder.writeUint16(t.length);
+            expect(t, 'PolygonRing'), this.byteBuilder.writeUint32(t.length);
             for (let e = 0; e < t.length; e++) {
                 n = this.indexedCoordinates.getIceX(t[e].longitude);
                 2 == i ? this.byteBuilder.writeUint16(n) : this.byteBuilder.writeUint32(n);
@@ -213,7 +214,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             return;
 
           case 'yRings':
-            expect(t, 'PolygonRing'), aver(t.length <= 65536), this.byteBuilder.writeUint16(t.length);
+            expect(t, 'PolygonRing'), this.byteBuilder.writeUint32(t.length);
             for (let e = 0; e < t.length; e++) {
                 s = this.indexedCoordinates.getIceY(t[e].latitude);
                 2 == i ? this.byteBuilder.writeUint16(s) : this.byteBuilder.writeUint32(s);
@@ -227,20 +228,16 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             return void this.byteBuilder.writeFloat32(t.latitude);
 
           case 'lngSegment':
-            return expect(t, 'Array'), aver(t.length <= 65536), this.byteBuilder.writeUint16(t.length), 
-            void t.forEach((e => this.byteBuilder.writeFloat32(e.longitude)));
+            return expect(t, 'Array'), this.byteBuilder.writeUint32(t.length), void t.forEach((e => this.byteBuilder.writeFloat32(e.longitude)));
 
           case 'latSegment':
-            return expect(t, 'Array'), aver(t.length <= 65536), this.byteBuilder.writeUint16(t.length), 
-            void t.forEach((e => this.byteBuilder.writeFloat32(e.latitude)));
+            return expect(t, 'Array'), this.byteBuilder.writeUint32(t.length), void t.forEach((e => this.byteBuilder.writeFloat32(e.latitude)));
 
           case 'lngRings':
-            return expect(t, 'PolygonRing'), aver(t.length <= 65536), this.byteBuilder.writeUint16(t.length), 
-            void t.forEach((e => this.byteBuilder.writeFloat32(e.longitude)));
+            return expect(t, 'PolygonRing'), this.byteBuilder.writeUint32(t.length), void t.forEach((e => this.byteBuilder.writeFloat32(e.longitude)));
 
           case 'latRings':
-            return expect(t, 'PolygonRing'), aver(t.length <= 65536), this.byteBuilder.writeUint16(t.length), 
-            void t.forEach((e => this.byteBuilder.writeFloat32(e.latitude)));
+            return expect(t, 'PolygonRing'), this.byteBuilder.writeUint32(t.length), void t.forEach((e => this.byteBuilder.writeFloat32(e.latitude)));
 
           case 'tinyInt':
             return void this.byteBuilder.writeInt8(t);
@@ -285,7 +282,7 @@ export default class ByteEncodedSerializer extends EncodedSerializer {
             void t.forEach((e => this.byteBuilder.writeUint32(e)));
 
           case 'float':
-            return void this.byteBuilder.writeFloat32(t);
+            return void this.byteBuilder.writeFloat32(Number(t));
 
           case 'float[]':
             return expect(t, 'Array'), aver(t.length <= 255), this.byteBuilder.writeUint8(t.length), 

@@ -297,7 +297,7 @@ export default class StringEncodedSerializer extends EncodedSerializer {
           case 'shortUint':
           case 'longInt':
           case 'longUint':
-            return void (null == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(Math.round(e)));
+            return void (0 === e ? this.stringBuilder.putline(Math.round(e)) : null == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(Math.round(e)));
 
           case 'tinyInt[]':
           case 'tinyUint[]':
@@ -308,7 +308,7 @@ export default class StringEncodedSerializer extends EncodedSerializer {
             return expect(e, 'Array'), void (0 == e.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.map((t => Math.round(t))).join(',')));
 
           case 'float':
-            return void (null == e || null == e || '' == e ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.toFixed(this.accuracy)));
+            return void (0 === e ? this.stringBuilder.putline(e.toFixed(this.accuracy)) : 'null' == e || null == e || null == e || '' == e ? this.stringBuilder.putline(null) : this.stringBuilder.putline(Number(e).toFixed(this.accuracy)));
 
           case 'float[]':
             return expect(e, 'Array'), void (0 == e.length ? this.stringBuilder.putline('') : this.stringBuilder.putline(e.map((t => t.toFixed(this.accuracy))).join(',')));

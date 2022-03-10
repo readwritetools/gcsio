@@ -131,30 +131,30 @@ export default class ByteEncodedParser extends EncodedParser {
             return a.push(this.deIceLatitude()), !0;
 
           case 'xSegment':
-            var i = this.readUint16();
+            var i = this.readUint32();
             for (let e = 0; e < i; e++) s.push(this.deIceLongitude());
             return !0;
 
           case 'ySegment':
-            var n = this.readUint16();
+            var n = this.readUint32();
             for (let e = 0; e < n; e++) a.push(this.deIceLatitude());
             return !0;
 
           case 'xRings':
-            var o = this.readUint8();
+            var o = this.readUint16();
             for (let e = 0; e < o; e++) {
                 let e = new Array;
-                i = this.readUint16();
+                i = this.readUint32();
                 for (let t = 0; t < i; t++) e.push(this.deIceLongitude());
                 s.push(e);
             }
             return !0;
 
           case 'yRings':
-            o = this.readUint8();
+            o = this.readUint16();
             for (let e = 0; e < o; e++) {
                 let e = new Array;
-                n = this.readUint16();
+                n = this.readUint32();
                 for (let t = 0; t < n; t++) e.push(this.deIceLatitude());
                 a.push(e);
             }
@@ -167,37 +167,37 @@ export default class ByteEncodedParser extends EncodedParser {
             return a.push(Math.fround(this.readFloat32())), !0;
 
           case 'lngSegment':
-            var d = this.readUint16();
+            var d = this.readUint32();
             for (let e = 0; e < d; e++) s.push(Math.fround(this.readFloat32()));
             return !0;
 
           case 'latSegment':
-            var h = this.readUint16();
+            var h = this.readUint32();
             for (let e = 0; e < h; e++) a.push(Math.fround(this.readFloat32()));
             return !0;
 
           case 'lngRings':
-            o = this.readUint8();
+            o = this.readUint16();
             for (let e = 0; e < o; e++) {
                 let e = new Array;
-                d = this.readUint16();
+                d = this.readUint32();
                 for (let t = 0; t < d; t++) e.push(this.readFloat32());
                 s.push(e);
             }
             return !0;
 
           case 'latRings':
-            o = this.readUint8();
+            o = this.readUint16();
             for (let e = 0; e < o; e++) {
                 let e = new Array;
-                h = this.readUint16();
+                h = this.readUint32();
                 for (let t = 0; t < h; t++) e.push(this.readFloat32());
                 a.push(e);
             }
             return !0;
 
           case 'arcRefs':
-            o = this.readUint8();
+            o = this.readUint16();
             this.readRingArcRefs(e.outerRing);
             const l = o - 1;
             for (let t = 0; t < l; t++) e.innerRings.push(new PolygonRing), this.readRingArcRefs(e.innerRings[t]);
@@ -208,7 +208,7 @@ export default class ByteEncodedParser extends EncodedParser {
         }
     }
     readRingArcRefs(e) {
-        if (expect(e, 'PolygonRing'), 8 == this.arcRefLenBits) var t = this.readUint8(); else t = this.readUint16();
+        if (expect(e, 'PolygonRing'), 8 == this.arcRefLenBits) var t = this.readUint8(); else if (16 == this.arcRefLenBits) t = this.readUint16(); else t = this.readUint32();
         for (let d = 0; d < t; d++) {
             if (16 == this.arcIndexLenBits) var r = this.readInt16(); else r = this.readInt32();
             var s = Math.abs(r), a = this.topology.taeArcs[s];

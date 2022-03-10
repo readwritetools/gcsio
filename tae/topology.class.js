@@ -49,7 +49,7 @@ export class Topology {
         this.taeEdges.topologyReductionType3 > 0 && terminal.trace(`${this.taeEdges.topologyReductionType3} triple-edge ownership edges disregarded`);
     }
     buildOneRingsEdges(e, s, t) {
-        expect(e, 'PolygonRing'), expect(s, 'String'), expect(t, [ 'String', 'undefined' ]), 
+        expect(e, 'PolygonRing'), expect(s, 'String'), expect(t, [ 'String', 'undefined', 'null' ]), 
         e.type = s, e.polygonName = t || '';
         for (let s = 0; s < e.length - 1; s++) {
             let t = e[s], r = e[s + 1], o = this.inverseCoords.get(t.mapKey);

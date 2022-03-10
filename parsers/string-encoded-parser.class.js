@@ -219,7 +219,7 @@ export default class StringEncodedParser extends EncodedParser {
           case 'shortInt':
           case 'longInt':
           case 'float':
-            return e.kvPairs[t] = '' == s ? null : Number(s), !0;
+            return e.kvPairs[t] = '' == s || 'null' == s ? null : Number(s), !0;
 
           case 'tinyUint[]':
           case 'shortUint[]':

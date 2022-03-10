@@ -96,18 +96,20 @@ options:
     --accuracy=   digits to use for latitude and longitude coordinates 1 to 6 (1=11km, 2=1100m, 3=110m, 4=11m, 5=1.1m, 6=11cm)
     --dataset-id= identifier for the collection of points, lines or polygons
     --properties  which properties to include with each feature
-                    a comma-separated list of property names, or the keyword 'none' or 'all'
+                    a comma-separated list of property names, or the keyword 'none' or 'all'†
     --declarations  the name of a file which contains declarations of property names and property types
                     where each line is in the form "name=type"
                     Valid types are:
                       string, string[],
-                      tinyint, tinyuint, tinyint[], tinyuint[]
-                      shortint, shortuint, shortint[], shortuint[]
-                      longint, longuint, longint[], longuint[]
+                      tinyInt, tinyUint, tinyInt[], tinyUint[]
+                      shortInt, shortUint, shortInt[], shortUint[]
+                      longInt, longUint, longInt[], longUint[]
                       float, float[]
                       json
     --version
     --help
+
+† default
 ```
 
 #### Browser
