@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --max-old-space-size=4096
 
 import CLI from './api/cli.js';
 var cli = new CLI();
