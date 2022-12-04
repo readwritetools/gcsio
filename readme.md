@@ -12,7 +12,7 @@
 
 
 <figure>
-	<img src='/img/libs/gcsio/gcsio.png' width='100%' />
+	<img src='/img/tasks/gcsio/gcsio.png' width='100%' />
 	<figcaption></figcaption>
 </figure>
 
@@ -136,7 +136,7 @@ and <a href='https://www.npmjs.com/package/softlib'>softlib</a>
 
 
 <table>
-	<tr><td><img src='/img/48x48/read-write-hub.png' alt='Read Write Hub logo' width=48 /></td>	<td>Documentation</td> 		<td><a href='https://hub.readwritetools.com/libs/gcsio.blue'>Read Write Hub</a></td></tr>
+	<tr><td><img src='/img/48x48/read-write-hub.png' alt='Read Write Hub logo' width=48 /></td>	<td>Documentation</td> 		<td><a href='https://hub.readwritetools.com/tasks/gcsio.blue'>Read Write Hub</a></td></tr>
 	<tr><td><img src='/img/48x48/git.png' alt='git logo' width=48 /></td>	<td>Source code</td> 			<td><a href='https://github.com/readwritetools/gcsio'>github</a></td></tr>
 	<tr><td><img src='/img/48x48/npm.png' alt='npm logo' width=48 /></td>	<td>Package installation</td> <td><a href='https://www.npmjs.com/package/gcsio'>npm</a></td></tr>
 </table>
@@ -146,7 +146,7 @@ and <a href='https://www.npmjs.com/package/softlib'>softlib</a>
 The <span>gcsio</span> library is not freeware. After evaluating it and before
 using it in a public-facing website, eBook, mobile app, or desktop application,
 you must obtain a license from <a href='https://readwritetools.com/licensing.blue'>Read Write Tools</a>
-as part of the <a href='https://hub.readwritetools.com/components/orthographic-earth.blue'>rwt-orthographic-earth</a>
+as part of the <a href='https://hub.readwritetools.com/components/thematic-earth.blue'>thematic-earth</a>
 DOM Component.
 
 <img src='/img/blue-seal-premium-software.png' width=80 align=right />
