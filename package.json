@@ -1,7 +1,7 @@
 {
   "name": "gcsio",
   "version": "1.0.17",
-  "description": "CLI tool for reading and writing Geographic Coordinate System file encodings.",
+  "description": "CLI tool for reading and writing Geographic Coordinate System encoded files.",
   "author": "Joe Honton",
   "license": "see license.html",
   "type": "module",
@@ -38,13 +38,8 @@
   "homepage": "https://hub.readwritetools.com/libs/gcsio.blue",
   "files": [
     "api",
-    "gcs",
-    "ice",
+    "gcslib",
     "img",
-    "parsers",
-    "serializers",
-    "tae",
-    "util",
     "license.blue",
     "license.html",
     "main.mjs",
@@ -56,7 +51,7 @@
       "commonjs": false
     },
     "suitability": {
-      "browser": "api",
+      "browser": "none",
       "nodejs": "cli and api"
     }
   }
