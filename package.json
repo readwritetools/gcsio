@@ -1,6 +1,6 @@
 {
   "name": "gcsio",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "CLI tool for reading and writing Geographic Coordinate System encoded files.",
   "author": "Joe Honton",
   "license": "see license.html",
