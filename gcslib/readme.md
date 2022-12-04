@@ -12,15 +12,15 @@
 
 
 <figure>
-	<img src='/img/libs/gcsio/gcsio.png' width='100%' />
+	<img src='/img/libs/gcslib/gcslib.png' width='100%' />
 	<figcaption></figcaption>
 </figure>
 
 ##### Thematic Earth
 
-# GCS I/O
+# GCSLIB
 
-## Reading and Writing GCS Files
+## Geographic Coordinate System Formats
 
 
 <address>
@@ -30,7 +30,7 @@
 
 <table>
 	<tr><th>Abstract</th></tr>
-	<tr><td>The <span class=product>gcsio</span> CLI tool is for reading and writing Geographic Coordinate System encoded files. It serves as a GIS exchange format for points, lines, and polygons that use longitude/latitude coordinates.</td></tr>
+	<tr><td>The <span class=product>gcslib</span> JavaScript library is for parsing and serializing Geographic Coordinate System file encodings. It serves as a GIS exchange format for points, lines, and polygons that use longitude/latitude coordinates.</td></tr>
 </table>
 
 ### Motivation
@@ -41,7 +41,8 @@ format.
 
 ### Summary
 
-The `gcsio` package is a command line utility wrapper for the `gcslib` core library.
+The `gcslib` package is a core JavaScript library used by the Geoplex package, the
+GCSIO command line tool, and the Thematic Earth web component.
 
 Supported input and output formats comprise:
 
@@ -53,16 +54,18 @@ Supported input and output formats comprise:
    * icebin - Indexed Coordinate Encoding binary
    * taebin - Topological Arc Encoding binary
 
-The CLI uses the node.js filesystem package to read and write files using the
-API's exported functions.
+The JavaScript API reads from and writes to standard ECMAScript Strings and
+ArrayBuffers.
 
-See also: The `gcslib` core API parses and serializes to standard ECMAScript
-Strings and ArrayBuffers, with using the host computer's file system, so it can
-be used with client facing web pages that obtain data using HTTP.
+The API does not access the host computer's file system, so it can be used with
+client facing web pages that obtain data using HTTP.
+
+The GCSIO CLI uses the node.js filesystem package to read and write files using
+the API's exported functions.
 
 ### Installation
 
-The <span>gcsio</span> library may be installed directly from github or via
+The <span>gcslib</span> library may be installed directly from github or via
 NPM.
 
 #### Node.js
@@ -108,12 +111,40 @@ options:
 † default
 ```
 
+#### Browser
+
+To install and use the API
+
+```bash
+[user@host]# git clone https://github.com/readwritetools/gcslib.git
+```
+
+Sample web frontend to fetch and parse an ICE file into memory:
+
+```javascript
+import API from 'node_modules/gcslib/api/user-api.js'
+import GcsHoldingArea from 'node_modules/gcslib/gcs/gcs-holding-area.class.js'
+    
+var response = await fetch("https://example.com/my-dataset.ice");
+var payload = await response.text();
+
+var gcsHoldingArea = new GcsHoldingArea();
+var options = {
+    inputFormat: "ice",
+    datasetId: "myDataset",
+    properties: "all"
+};
+
+if (API.parseIce(gcsHoldingArea, payload, options) == true) {
+    // gcsHoldingArea now contains the parsed features with their geometries and properties.
+}
+```
+
 ### Metadata
 
 #### Dependencies
 
-This library depends on <a href='https://www.npmjs.com/package/iolib'>iolib</a>
-and <a href='https://www.npmjs.com/package/softlib'>softlib</a>
+This library depends on <a href='https://www.npmjs.com/package/softlib'>softlib</a>
 .
 
 #### Module exports
@@ -129,24 +160,24 @@ and <a href='https://www.npmjs.com/package/softlib'>softlib</a>
 
 <table>
 	<tr><td>Browser</td> 			<td>API</td></tr>
-	<tr><td>node.js</td> 			<td>CLI and API</td></tr>
+	<tr><td>node.js</td> 			<td>API</td></tr>
 </table>
 
 #### Availability
 
 
 <table>
-	<tr><td><img src='/img/48x48/read-write-hub.png' alt='Read Write Hub logo' width=48 /></td>	<td>Documentation</td> 		<td><a href='https://hub.readwritetools.com/libs/gcsio.blue'>Read Write Hub</a></td></tr>
-	<tr><td><img src='/img/48x48/git.png' alt='git logo' width=48 /></td>	<td>Source code</td> 			<td><a href='https://github.com/readwritetools/gcsio'>github</a></td></tr>
-	<tr><td><img src='/img/48x48/npm.png' alt='npm logo' width=48 /></td>	<td>Package installation</td> <td><a href='https://www.npmjs.com/package/gcsio'>npm</a></td></tr>
+	<tr><td><img src='/img/48x48/read-write-hub.png' alt='Read Write Hub logo' width=48 /></td>	<td>Documentation</td> 		<td><a href='https://hub.readwritetools.com/libs/gcslib.blue'>Read Write Hub</a></td></tr>
+	<tr><td><img src='/img/48x48/git.png' alt='git logo' width=48 /></td>	<td>Source code</td> 			<td><a href='https://github.com/readwritetools/gcslib'>github</a></td></tr>
+	<tr><td><img src='/img/48x48/npm.png' alt='npm logo' width=48 /></td>	<td>Package installation</td> <td><a href='https://www.npmjs.com/package/gcslib'>npm</a></td></tr>
 </table>
 
 #### License
 
-The <span>gcsio</span> library is not freeware. After evaluating it and before
-using it in a public-facing website, eBook, mobile app, or desktop application,
-you must obtain a license from <a href='https://readwritetools.com/licensing.blue'>Read Write Tools</a>
-as part of the <a href='https://hub.readwritetools.com/components/orthographic-earth.blue'>rwt-orthographic-earth</a>
+The <span>gcslib</span> library is not freeware. After evaluating it and
+before using it in a public-facing website, eBook, mobile app, or desktop
+application, you must obtain a license from <a href='https://readwritetools.com/licensing.blue'>Read Write Tools</a>
+as part of the <a href='https://hub.readwritetools.com/components/thematic-earth.blue'>thematic-earth</a>
 DOM Component.
 
 <img src='/img/blue-seal-premium-software.png' width=80 align=right />
